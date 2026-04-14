@@ -3,8 +3,6 @@ package com.topwatch.back_topwatch.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -14,15 +12,13 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
     @Column(unique = true)
     private String email;
-    private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Token> tokens;
+    private String password;
 }
