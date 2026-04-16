@@ -8,7 +8,7 @@ public class UserController {
 
     @GetMapping(value = "health")
     public String healthCheck(){
-        return "Hola mundo";
+        return "Hello world";
     }
 
 }
