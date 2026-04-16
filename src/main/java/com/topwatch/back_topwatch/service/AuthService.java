@@ -1,5 +1,6 @@
 package com.topwatch.back_topwatch.service;
 
+import com.topwatch.back_topwatch.domain.Role;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.dto.AuthResponse;
 import com.topwatch.back_topwatch.dto.LoginRequest;
@@ -25,6 +26,7 @@ public class AuthService {
                 .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);

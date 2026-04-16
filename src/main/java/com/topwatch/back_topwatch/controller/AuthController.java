@@ -16,26 +16,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "Endpoints de autenticación")
+@Tag(name = "Auth", description = "Authentication endpoints")
 public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "Registrar usuario", description = "Crea una nueva cuenta y retorna access token y refresh token")
+    @Operation(summary = "Register user", description = "Creates a new account and returns access token and refresh token")
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
-    @Operation(summary = "Iniciar sesión", description = "Autentica al usuario y retorna access token y refresh token")
+    @Operation(summary = "Login", description = "Authenticates the user and returns access token and refresh token")
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @Operation(
-            summary = "Renovar tokens",
-            description = "Recibe el refresh token en el header Authorization y retorna nuevos tokens",
+            summary = "Refresh tokens",
+            description = "Receives the refresh token in the Authorization header and returns new tokens",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping("/refresh")
