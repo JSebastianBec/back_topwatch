@@ -113,7 +113,7 @@
       ]
     },
     {
-      "name": "Health",
+      "name": "Users",
       "item": [
         {
           "name": "Health Check",
@@ -123,9 +123,70 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/health",
+              "raw": "{{base_url}}/api/v1/users/health",
               "host": ["{{base_url}}"],
-              "path": ["health"]
+              "path": ["api", "v1", "users", "health"]
+            }
+          }
+        },
+        {
+          "name": "Update Current User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan Sebastian\",\n  \"lastname\": \"Becerra\",\n  \"nickname\": \"juanseb\",\n  \"gender\": \"MALE\",\n  \"email\": \"juan@topwatch.com\",\n  \"password\": \"newPassword123\",\n  \"avatarURL\": \"https://example.com/avatar.png\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/user/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "user", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/delete/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "delete", "1"]
             }
           }
         }
