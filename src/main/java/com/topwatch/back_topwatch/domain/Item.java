@@ -29,7 +29,7 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private Type type;
     @ManyToMany(mappedBy = "items", fetch = FetchType.LAZY)
-    private java.util.List<List> lists;
+    private java.util.List<ListTop> listTops;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "item_categories",

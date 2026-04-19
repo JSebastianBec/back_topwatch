@@ -3,6 +3,8 @@ package com.topwatch.back_topwatch.service;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.dto.UpdateUserRequest;
 import com.topwatch.back_topwatch.repository.UserRepository;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +32,7 @@ public class UserService {
         return userRepository.save(currentUser);
     }
 
-    public Optional<User> findUserById(Long id){
+    public Optional<User> findUserById(@NonNull Long id){
         return userRepository.findById(id);
     }
 

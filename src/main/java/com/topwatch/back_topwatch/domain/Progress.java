@@ -23,7 +23,7 @@ public class Progress {
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "list_id")
-    private List list;
+    private ListTop listTop;
     private Date creationDate;
     private Date lastUpdated;
     private Integer itemsFinished;

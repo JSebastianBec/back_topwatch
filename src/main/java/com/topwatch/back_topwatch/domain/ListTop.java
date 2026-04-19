@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "lists")
-public class List {
+public class ListTop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
