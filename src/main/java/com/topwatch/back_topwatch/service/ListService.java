@@ -23,11 +23,11 @@ public class ListService {
         listRepository.delete(listTop);
     }
 
-    public Optional<ListTop> getListTop(@NonNull Long id){
+    public Optional<ListTop> findListTop(@NonNull Long id){
         return listRepository.findById(id);
     }
 
-    public List<ListTop> getAllListTop(){
+    public List<ListTop> findAllListTop(){
         return listRepository.findAll();
     }
 }
