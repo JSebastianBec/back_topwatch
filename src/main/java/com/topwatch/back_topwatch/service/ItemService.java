@@ -1,7 +1,5 @@
 package com.topwatch.back_topwatch.service;
 
-import com.topwatch.back_topwatch.domain.Item;
-import com.topwatch.back_topwatch.repository.ItemRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
