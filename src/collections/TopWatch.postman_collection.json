@@ -1,0 +1,635 @@
+{
+  "info": {
+    "_postman_id": "b6b1a6e0-6b0a-4c7a-9b1a-topwatch00001",
+    "name": "TopWatch API",
+    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout) and user management (profile, list, get, delete). Test scripts on the auth requests automatically save accessToken/refreshToken/userId as collection variables so the rest of the requests work out of the box.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" },
+    { "key": "user_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"password123\",\n    \"nickname\": \"sebas\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "auth", "register" ]
+            },
+            "description": "Creates a new account. Saves the returned tokens into {{access_token}} and {{refresh_token}} automatically."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"password123\",\n    \"nickname\": \"sebas\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/register",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "register" ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJpYXQiOjE3NTUzMDAwMDAsImV4cCI6MTc1NTMwMDkwMH0.EXAMPLE-SIGNATURE-1\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmNmU1ZDQtYzNiMi1hMTAwLTk4NzYtNTQzMjEwZmVkY2JhIiwiaWF0IjoxNzU1MzAwMDAwLCJleHAiOjE3NTU5MDQ4MDB9.EXAMPLE-SIGNATURE-2\"\n}"
+            },
+            {
+              "name": "409 Conflict - Email or nickname already in use",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"password123\",\n    \"nickname\": \"sebas\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/register",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "register" ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Email or nickname is already in use\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"not-an-email\",\n    \"password\": \"short\",\n    \"nickname\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/register",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "register" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"email\": \"Email must be valid\",\n    \"password\": \"Password must be at least 8 characters\",\n    \"nickname\": \"Nickname is required\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "auth", "login" ]
+            },
+            "description": "Authenticates the user. Saves the returned tokens into {{access_token}} and {{refresh_token}} automatically."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "login" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJpYXQiOjE3NTUzMDAwMDAsImV4cCI6MTc1NTMwMDkwMH0.EXAMPLE-SIGNATURE-1\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmNmU1ZDQtYzNiMi1hMTAwLTk4NzYtNTQzMjEwZmVkY2JhIiwiaWF0IjoxNzU1MzAwMDAwLCJleHAiOjE3NTU5MDQ4MDB9.EXAMPLE-SIGNATURE-2\"\n}"
+            },
+            {
+              "name": "401 Unauthorized - Bad credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"wrong-password\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "login" ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Bad credentials\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', json.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{refresh_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/refresh",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "auth", "refresh" ]
+            },
+            "description": "Sends the refresh token (not the access token) in the Authorization header and returns a new token pair."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{refresh_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/refresh",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "refresh" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhYWJiY2NkZC0xMTIyLTMzNDQtNTU2Ni03Nzg4OTlhYWJiY2MiLCJpYXQiOjE3NTUzMDA5MDAsImV4cCI6MTc1NTMwMTgwMH0.EXAMPLE-SIGNATURE-3\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJkZGVlZmYwMC0zMzQ0LTU1NjYtNzc4OC05OWFhYmJjY2RkZWUiLCJpYXQiOjE3NTUzMDA5MDAsImV4cCI6MTc1NTkwNTcwMH0.EXAMPLE-SIGNATURE-4\"\n}"
+            },
+            {
+              "name": "401 Unauthorized - Missing/invalid header",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/refresh",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "refresh" ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": ""
+            },
+            {
+              "name": "401 Unauthorized - Revoked refresh token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{refresh_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/refresh",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "refresh" ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Refresh token has been revoked\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "auth", "logout" ]
+            },
+            "description": "Revokes the access token in the header and, optionally, the refresh token in the body. The refreshToken field can be omitted to only revoke the access token."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/logout",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "logout" ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": ""
+            },
+            {
+              "name": "401 Unauthorized - Missing header",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/logout",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "auth", "logout" ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/health",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "users", "health" ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/health",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "health" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [ { "key": "Content-Type", "value": "text/plain;charset=UTF-8" } ],
+              "body": "Hello world"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('user_id', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "users", "me" ]
+            },
+            "description": "Returns the authenticated user's own profile. Saves the id into {{user_id}} automatically."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/me",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "me" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": null,\n    \"lastname\": null,\n    \"nickname\": \"sebas\",\n    \"gender\": null,\n    \"email\": \"sebas@topwatch.com\",\n    \"role\": \"USER\",\n    \"avatarURL\": null,\n    \"authorities\": [ { \"authority\": \"ROLE_USER\" } ],\n    \"username\": \"sebas@topwatch.com\",\n    \"accountNonExpired\": true,\n    \"accountNonLocked\": true,\n    \"credentialsNonExpired\": true,\n    \"enabled\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Current User (me)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"newPassword123\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "users", "me" ]
+            },
+            "description": "Partial update: any field can be omitted or left null/blank and it will be kept unchanged."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"newPassword123\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/me",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "me" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"role\": \"USER\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\",\n    \"authorities\": [ { \"authority\": \"ROLE_USER\" } ],\n    \"username\": \"sebas@topwatch.com\",\n    \"accountNonExpired\": true,\n    \"accountNonLocked\": true,\n    \"credentialsNonExpired\": true,\n    \"enabled\": true\n}"
+            },
+            {
+              "name": "409 Conflict - Nickname already in use",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nickname\": \"already-taken\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/me",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "me" ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Nickname is already in use\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/users",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "users", "users" ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/users",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "users" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Sebastian\",\n        \"lastname\": \"Becerra\",\n        \"nickname\": \"sebas\",\n        \"gender\": \"MALE\",\n        \"email\": \"sebas@topwatch.com\",\n        \"role\": \"USER\",\n        \"avatarURL\": null\n    },\n    {\n        \"id\": 2,\n        \"name\": null,\n        \"lastname\": null,\n        \"nickname\": \"otheruser\",\n        \"gender\": null,\n        \"email\": \"other@topwatch.com\",\n        \"role\": \"USER\",\n        \"avatarURL\": null\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/user/{{user_id}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "users", "user", "{{user_id}}" ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/user/1",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "user", "1" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"role\": \"USER\",\n    \"avatarURL\": null\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/user/999",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "user", "999" ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Delete User By Id",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/delete/{{user_id}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "users", "delete", "{{user_id}}" ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/delete/1",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "delete", "1" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/delete/999",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "delete", "999" ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
