@@ -1,6 +1,7 @@
 package com.topwatch.back_topwatch.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -72,11 +73,18 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            // The token is expired but still well-formed and correctly signed: return its
+            // claims anyway so callers like isTokenValid()/isTokenExpired() can evaluate
+            // expiration explicitly instead of every caller having to catch this exception.
+            return e.getClaims();
+        }
     }
 
     private SecretKey getSigningKey() {
