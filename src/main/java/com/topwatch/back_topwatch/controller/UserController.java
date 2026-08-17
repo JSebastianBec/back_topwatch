@@ -33,11 +33,23 @@ public class UserController {
     }
 
     @Operation(
+            summary = "Get current user",
+            description = "Returns the authenticated user's profile",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser(
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(currentUser);
+    }
+
+    @Operation(
             summary = "Update current user",
             description = "Updates the authenticated user's profile with the provided fields",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping("/me")
+    @PatchMapping("/me")
     public ResponseEntity<User> update(
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal User currentUser

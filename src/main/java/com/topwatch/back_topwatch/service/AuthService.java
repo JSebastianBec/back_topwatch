@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +21,13 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public AuthResponse register(RegisterRequest request) {
         var user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
+                .nickname(request.nickname())
                 .role(Role.USER)
                 .build();
 
@@ -51,6 +54,10 @@ public class AuthService {
     }
 
     public AuthResponse refreshToken(String refreshToken) {
+        if (tokenBlacklistService.isRevoked(jwtService.extractJti(refreshToken))) {
+            throw new IllegalArgumentException("Refresh token has been revoked");
+        }
+
         final String userEmail = jwtService.extractUsername(refreshToken);
 
         var user = userRepository.findByEmail(userEmail)
@@ -64,5 +71,12 @@ public class AuthService {
                 jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user)
         );
+    }
+
+    public void logout(String accessToken, String refreshToken) {
+        tokenBlacklistService.revoke(accessToken);
+        if (StringUtils.hasText(refreshToken)) {
+            tokenBlacklistService.revoke(refreshToken);
+        }
     }
 }

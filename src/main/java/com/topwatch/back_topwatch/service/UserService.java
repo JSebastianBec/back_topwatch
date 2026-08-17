@@ -2,13 +2,15 @@ package com.topwatch.back_topwatch.service;
 
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.dto.UpdateUserRequest;
+import com.topwatch.back_topwatch.exception.DuplicateResourceException;
 import com.topwatch.back_topwatch.repository.UserRepository;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,14 +22,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public User update(@NonNull User currentUser, UpdateUserRequest request) {
-        if (request.name() != null)      currentUser.setName(request.name());
-        if (request.lastname() != null)  currentUser.setLastname(request.lastname());
-        if (request.nickname() != null)  currentUser.setNickname(request.nickname());
-        if (request.gender() != null)    currentUser.setGender(request.gender());
-        if (request.email() != null)     currentUser.setEmail(request.email());
-        if (request.avatarURL() != null) currentUser.setAvatarURL(request.avatarURL());
-        if (request.password() != null)  currentUser.setPassword(passwordEncoder.encode(request.password()));
+        if (StringUtils.hasText(request.name()))      currentUser.setName(request.name());
+        if (StringUtils.hasText(request.lastname()))  currentUser.setLastname(request.lastname());
+        if (request.gender() != null)                 currentUser.setGender(request.gender());
+        if (StringUtils.hasText(request.avatarURL())) currentUser.setAvatarURL(request.avatarURL());
+        if (StringUtils.hasText(request.password()))  currentUser.setPassword(passwordEncoder.encode(request.password()));
+
+        if (StringUtils.hasText(request.nickname()) && !request.nickname().equals(currentUser.getNickname())) {
+            if (userRepository.existsByNicknameAndIdNot(request.nickname(), currentUser.getId())) {
+                throw new DuplicateResourceException("Nickname is already in use");
+            }
+            currentUser.setNickname(request.nickname());
+        }
+
+        if (StringUtils.hasText(request.email()) && !request.email().equals(currentUser.getEmail())) {
+            if (userRepository.existsByEmailAndIdNot(request.email(), currentUser.getId())) {
+                throw new DuplicateResourceException("Email is already in use");
+            }
+            currentUser.setEmail(request.email());
+        }
 
         return userRepository.save(currentUser);
     }
