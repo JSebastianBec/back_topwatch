@@ -205,7 +205,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"My Watch List\",\n  \"description\": \"Movies I want to watch\",\n  \"type\": \"MOVIE\"\n}"
+              "raw": "{\n  \"name\": \"My Watch List\",\n  \"description\": \"Movies I want to watch\",\n  \"type\": \"MOVIES\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/lists/save",
@@ -271,7 +271,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Inception\",\n  \"description\": \"A mind-bending thriller\",\n  \"type\": \"MOVIE\",\n  \"avatarURL\": \"https://example.com/inception.png\"\n}"
+              "raw": "{\n  \"name\": \"Inception\",\n  \"description\": \"A mind-bending thriller\",\n  \"type\": \"MOVIES\",\n  \"avatarURL\": \"https://example.com/inception.png\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/items/save",
@@ -319,6 +319,100 @@
               "raw": "{{base_url}}/api/v1/items/delete/1",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "items", "delete", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Items",
+      "item": [
+        {
+          "name": "Add Item to List",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"listTop\": { \"id\": 1 },\n  \"item\": { \"id\": 1 },\n  \"watched\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/list-items/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "list-items", "save"]
+            }
+          }
+        },
+        {
+          "name": "Get List-Item By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/list-items/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "list-items", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Items By List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/list-items/list/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "list-items", "list", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Lists By Item",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/list-items/item/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "list-items", "item", "1"]
+            }
+          }
+        },
+        {
+          "name": "Mark Item as Watched",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/list-items/watch/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "list-items", "watch", "1"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from List",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/list-items/delete/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "list-items", "delete", "1"]
             }
           }
         }
