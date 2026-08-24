@@ -28,7 +28,6 @@ public class UserService {
         if (StringUtils.hasText(request.lastname()))  currentUser.setLastname(request.lastname());
         if (request.gender() != null)                 currentUser.setGender(request.gender());
         if (StringUtils.hasText(request.avatarURL())) currentUser.setAvatarURL(request.avatarURL());
-        if (StringUtils.hasText(request.password()))  currentUser.setPassword(passwordEncoder.encode(request.password()));
 
         if (StringUtils.hasText(request.nickname()) && !request.nickname().equals(currentUser.getNickname())) {
             if (userRepository.existsByNicknameAndIdNot(request.nickname(), currentUser.getId())) {
