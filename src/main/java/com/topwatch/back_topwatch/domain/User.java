@@ -1,5 +1,6 @@
 package com.topwatch.back_topwatch.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,28 +25,29 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true)
+    @Column()
     private String name;
 
-    @Column(nullable = true)
+    @Column()
     private String lastname;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
+    @Column()
     private Gender gender;
 
     @Column(unique = true)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(nullable = true)
+    @Column()
     private String avatarURL;
 
     @Override

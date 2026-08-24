@@ -2,6 +2,7 @@ package com.topwatch.back_topwatch.controller;
 
 import com.topwatch.back_topwatch.dto.AuthResponse;
 import com.topwatch.back_topwatch.dto.LoginRequest;
+import com.topwatch.back_topwatch.dto.LogoutRequest;
 import com.topwatch.back_topwatch.dto.RegisterRequest;
 import com.topwatch.back_topwatch.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,5 +45,24 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(authService.refreshToken(authHeader.substring(7)));
+    }
+
+    @Operation(
+            summary = "Logout",
+            description = "Receives the access token in the Authorization header and, optionally, the refresh " +
+                    "token in the body, and revokes both so they can no longer be used",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody(required = false) LogoutRequest request
+    ) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String refreshToken = request != null ? request.refreshToken() : null;
+        authService.logout(authHeader.substring(7), refreshToken);
+        return ResponseEntity.noContent().build();
     }
 }

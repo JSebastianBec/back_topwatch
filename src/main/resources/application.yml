@@ -5,8 +5,8 @@ application:
   security:
     jwt:
       secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      expiration: 900000        # 15 minutos en ms  (access token)
-      refresh-expiration: 604800000  # 7 días en ms (refresh token)
+      expiration: 900000        # 15 minutes in ms (access token)
+      refresh-expiration: 604800000  # 7 days in ms (refresh token)
 
 spring:
   datasource:

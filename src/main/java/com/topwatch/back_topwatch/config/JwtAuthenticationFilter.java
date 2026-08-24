@@ -1,6 +1,7 @@
 package com.topwatch.back_topwatch.config;
 
 import com.topwatch.back_topwatch.service.JwtService;
+import com.topwatch.back_topwatch.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -39,6 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
+
+        if (tokenBlacklistService.isRevoked(jwtService.extractJti(jwt))) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String userEmail = jwtService.extractUsername(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
