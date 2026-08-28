@@ -23,11 +23,17 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", ex.getMessage()));
     }
 
-    // Safety net for races the pre-check in the service doesn't catch (e.g. concurrent requests)
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
+    // Safety net for races the pre-checks in the services don't catch (e.g. concurrent requests)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "Email or nickname is already in use"));
+                .body(Map.of("message", "A unique or required field constraint was violated"));
     }
 
 }

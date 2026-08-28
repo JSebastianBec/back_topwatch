@@ -1,0 +1,887 @@
+{
+  "uuid": "04a5aa3f-6794-42a0-8473-05d6404bf7a9",
+  "lastMigration": 33,
+  "name": "TopWatch API",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3000,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "176b14e5-14f2-4d0a-9d91-71fa65c29ad1",
+      "type": "http",
+      "documentation": "Register user",
+      "method": "post",
+      "endpoint": "api/v1/auth/register",
+      "responses": [
+        {
+          "uuid": "48dff1d6-f383-47ab-b8c7-12ed0b8f84a1",
+          "body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJlMWI2NGFjMy04NmNhLTRjODAtODMyMS1mMDkwYmFmMjVhZTIiLCJpYXQiOjE3ODY5Mzg4ODgsImV4cCI6MTc4NjkzOTc4OH0.AZH4erTnwnxJBDkLwHSb3L6pP5jGkH3hwJIL2TccGSnaIMhOv45cFGdnICmZCl71\",\n    \"refreshToken\": \"eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmOTJiYWZkYi05MmNjLTRlNDEtODYzOS02ZWI1YTRkOWYxYWQiLCJpYXQiOjE3ODY5Mzg4ODgsImV4cCI6MTc4NzU0MzY4OH0.hGZMACtgkahE7rhO6WG-pHV664Kp1pLNqMFlhzqGiwlvw21O9COshUN8IX68j5km\"\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "Created",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "c134f733-e2cb-444e-bf17-8911b6e76583",
+          "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJpYXQiOjE3NTUzMDAwMDAsImV4cCI6MTc1NTMwMDkwMH0.EXAMPLE-SIGNATURE-1\",\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmNmU1ZDQtYzNiMi1hMTAwLTk4NzYtNTQzMjEwZmVkY2JhIiwiaWF0IjoxNzU1MzAwMDAwLCJleHAiOjE3NTU5MDQ4MDB9.EXAMPLE-SIGNATURE-2\"\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "015042b6-59c4-4a6f-9bdf-90f6cefe821d",
+          "body": "{\n  \"message\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 409,
+          "label": "Conflict - email or nickname already in use",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "023f71a1-5df7-4eb2-80e2-caedf8e8087e",
+          "body": "{\n  \"message\": \"Email or nickname is already in use\"\n}",
+          "latency": 0,
+          "statusCode": 409,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "f141ceec-416f-4f4b-8c08-4727878a81d3",
+      "type": "http",
+      "documentation": "Login",
+      "method": "post",
+      "endpoint": "api/v1/auth/login",
+      "responses": [
+        {
+          "uuid": "605c162e-ce0a-4504-8b4e-c5473d687016",
+          "body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJlMWI2NGFjMy04NmNhLTRjODAtODMyMS1mMDkwYmFmMjVhZTIiLCJpYXQiOjE3ODY5Mzg4ODgsImV4cCI6MTc4NjkzOTc4OH0.AZH4erTnwnxJBDkLwHSb3L6pP5jGkH3hwJIL2TccGSnaIMhOv45cFGdnICmZCl71\",\n    \"refreshToken\": \"eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmOTJiYWZkYi05MmNjLTRlNDEtODYzOS02ZWI1YTRkOWYxYWQiLCJpYXQiOjE3ODY5Mzg4ODgsImV4cCI6MTc4NzU0MzY4OH0.hGZMACtgkahE7rhO6WG-pHV664Kp1pLNqMFlhzqGiwlvw21O9COshUN8IX68j5km\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "e3c809de-a9c4-4636-8d7f-7cbe44c83c0a",
+          "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJpYXQiOjE3NTUzMDAwMDAsImV4cCI6MTc1NTMwMDkwMH0.EXAMPLE-SIGNATURE-1\",\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmNmU1ZDQtYzNiMi1hMTAwLTk4NzYtNTQzMjEwZmVkY2JhIiwiaWF0IjoxNzU1MzAwMDAwLCJleHAiOjE3NTU5MDQ4MDB9.EXAMPLE-SIGNATURE-2\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "61a57dbb-bafa-4722-a974-e469f6948d6a",
+          "body": "{\n  \"message\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "Unauthorized - bad credentials",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "1b86739f-508f-431b-82e7-0ca91f707386",
+          "body": "{\n  \"message\": \"Bad credentials\"\n}",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "1923702d-b073-412d-999b-343ce77b1f49",
+      "type": "http",
+      "documentation": "Refresh tokens",
+      "method": "post",
+      "endpoint": "api/v1/auth/refresh",
+      "responses": [
+        {
+          "uuid": "191a2201-6f2c-464b-a5f9-b846eb20c4fa",
+          "body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJlMWI2NGFjMy04NmNhLTRjODAtODMyMS1mMDkwYmFmMjVhZTIiLCJpYXQiOjE3ODY5Mzg4ODgsImV4cCI6MTc4NjkzOTc4OH0.AZH4erTnwnxJBDkLwHSb3L6pP5jGkH3hwJIL2TccGSnaIMhOv45cFGdnICmZCl71\",\n    \"refreshToken\": \"eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmOTJiYWZkYi05MmNjLTRlNDEtODYzOS02ZWI1YTRkOWYxYWQiLCJpYXQiOjE3ODY5Mzg4ODgsImV4cCI6MTc4NzU0MzY4OH0.hGZMACtgkahE7rhO6WG-pHV664Kp1pLNqMFlhzqGiwlvw21O9COshUN8IX68j5km\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "ead21260-b7a8-4a0e-8033-d02b1ca9ac0d",
+          "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhYWJiY2NkZC0xMTIyLTMzNDQtNTU2Ni03Nzg4OTlhYWJiY2MiLCJpYXQiOjE3NTUzMDA5MDAsImV4cCI6MTc1NTMwMTgwMH0.EXAMPLE-SIGNATURE-3\",\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJkZGVlZmYwMC0zMzQ0LTU1NjYtNzc4OC05OWFhYmJjY2RkZWUiLCJpYXQiOjE3NTUzMDA5MDAsImV4cCI6MTc1NTkwNTcwMH0.EXAMPLE-SIGNATURE-4\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "315b5653-a424-4913-ac67-67ddc07ac95f",
+          "body": "{\n  \"message\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "Unauthorized - missing header, invalid or revoked refresh token",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "ae87a3b4-c714-4121-8378-969910c0bb75",
+          "body": "{\n  \"message\": \"Refresh token has been revoked\"\n}",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "a0309542-faa8-455f-8fcb-807a2d68a65b",
+      "type": "http",
+      "documentation": "Logout",
+      "method": "post",
+      "endpoint": "api/v1/auth/logout",
+      "responses": [
+        {
+          "uuid": "eb7d57f9-824b-4adb-82b6-ab172606e537",
+          "body": "",
+          "latency": 0,
+          "statusCode": 204,
+          "label": "No Content",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "9683cb5b-ddc0-4fd2-b879-a03c2848aa8f",
+          "body": "",
+          "latency": 0,
+          "statusCode": 401,
+          "label": "Unauthorized - missing Authorization header",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "3d2a790a-dc0b-41d2-b3fe-22d6e2c4dff4",
+      "type": "http",
+      "documentation": "Health check",
+      "method": "get",
+      "endpoint": "api/v1/users/health",
+      "responses": [
+        {
+          "uuid": "b50fa858-4929-4698-9ffc-7762c1778217",
+          "body": "",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "text/plain"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "05b9b1fa-fe74-4099-808a-51a455938303",
+      "type": "http",
+      "documentation": "Get current user",
+      "method": "get",
+      "endpoint": "api/v1/users/me",
+      "responses": [
+        {
+          "uuid": "1850216b-a2e6-4d74-8685-57fc79d0e6e7",
+          "body": "{\n  \"id\": {{faker 'number.int' max=99999}},\n  \"name\": \"Usuario\",\n  \"lastname\": \"Prueba\",\n  \"nickname\": \"Itachi\",\n  \"gender\": \"{{oneOf 'MALE' 'FEMALE' 'OTHER' 'NOT_SAYED'}}\",\n  \"email\": \"prueba@test.com\",\n  \"role\": \"{{oneOf 'USER' 'ADMIN'}}\",\n  \"avatarURL\": \"https://static.wikia.nocookie.net/naruto/images/c/c8/Itachi_Uchiha_Parte_I_y_II_Anime.png/revision/latest?cb=20240616140511&path-prefix=es\",\n  \"username\": \"\",\n  \"authorities\": [\n    {\n      \"authority\": \"\"\n    }\n  ],\n  \"accountNonExpired\": {{faker 'datatype.boolean'}},\n  \"accountNonLocked\": {{faker 'datatype.boolean'}},\n  \"credentialsNonExpired\": {{faker 'datatype.boolean'}},\n  \"enabled\": {{faker 'datatype.boolean'}}\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "f0ecd48b-2583-4866-9a2a-c8abbc73ed06",
+          "body": "{\n  \"id\": 1,\n  \"name\": null,\n  \"lastname\": null,\n  \"nickname\": \"sebas\",\n  \"gender\": null,\n  \"email\": \"sebas@topwatch.com\",\n  \"role\": \"USER\",\n  \"avatarURL\": null,\n  \"username\": \"sebas@topwatch.com\",\n  \"authorities\": [\n    {\n      \"authority\": \"ROLE_USER\"\n    }\n  ],\n  \"accountNonExpired\": true,\n  \"accountNonLocked\": true,\n  \"credentialsNonExpired\": true,\n  \"enabled\": true\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "0c778408-67ad-4763-b730-1c5fbb63fb0f",
+      "type": "http",
+      "documentation": "Update current user",
+      "method": "patch",
+      "endpoint": "api/v1/users/me",
+      "responses": [
+        {
+          "uuid": "c5a7a3fd-c22e-4509-9715-98793097b9f9",
+          "body": "{\n  \"id\": {{faker 'number.int' max=99999}},\n  \"name\": \"\",\n  \"lastname\": \"\",\n  \"nickname\": \"\",\n  \"gender\": \"{{oneOf 'MALE' 'FEMALE' 'OTHER' 'NOT_SAYED'}}\",\n  \"email\": \"\",\n  \"role\": \"{{oneOf 'USER' 'ADMIN'}}\",\n  \"avatarURL\": \"\",\n  \"username\": \"\",\n  \"authorities\": [\n    {\n      \"authority\": \"\"\n    }\n  ],\n  \"accountNonExpired\": {{faker 'datatype.boolean'}},\n  \"accountNonLocked\": {{faker 'datatype.boolean'}},\n  \"credentialsNonExpired\": {{faker 'datatype.boolean'}},\n  \"enabled\": {{faker 'datatype.boolean'}}\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "4bdb0e88-619c-425c-8725-c76b2e799f25",
+          "body": "{\n  \"id\": 1,\n  \"name\": \"Sebastian\",\n  \"lastname\": \"Becerra\",\n  \"nickname\": \"sebas\",\n  \"gender\": \"MALE\",\n  \"email\": \"sebas@topwatch.com\",\n  \"role\": \"USER\",\n  \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\",\n  \"username\": \"sebas@topwatch.com\",\n  \"authorities\": [\n    {\n      \"authority\": \"ROLE_USER\"\n    }\n  ],\n  \"accountNonExpired\": true,\n  \"accountNonLocked\": true,\n  \"credentialsNonExpired\": true,\n  \"enabled\": true\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "f66f7b32-7bfc-4a3d-ac1b-6fde7c9183bd",
+          "body": "{\n  \"message\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 409,
+          "label": "Conflict - nickname or email already in use",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "fd1e8aef-f334-4b41-a803-c04ebe66806f",
+          "body": "{\n  \"message\": \"Nickname is already in use\"\n}",
+          "latency": 0,
+          "statusCode": 409,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "c5aed61e-7f7f-4ed3-9903-49d62e333fba",
+      "type": "http",
+      "documentation": "Return all users",
+      "method": "get",
+      "endpoint": "api/v1/users/users",
+      "responses": [
+        {
+          "uuid": "f6f62725-ebe9-4871-8a4c-3c53d3f5fc9a",
+          "body": "[\n  {\n    \"id\": {{faker 'number.int' max=99999}},\n    \"name\": \"\",\n    \"lastname\": \"\",\n    \"nickname\": \"\",\n    \"gender\": \"{{oneOf 'MALE' 'FEMALE' 'OTHER' 'NOT_SAYED'}}\",\n    \"email\": \"\",\n    \"role\": \"{{oneOf 'USER' 'ADMIN'}}\",\n    \"avatarURL\": \"\",\n    \"username\": \"\",\n    \"authorities\": [\n      {\n        \"authority\": \"\"\n      }\n    ],\n    \"accountNonExpired\": {{faker 'datatype.boolean'}},\n    \"accountNonLocked\": {{faker 'datatype.boolean'}},\n    \"credentialsNonExpired\": {{faker 'datatype.boolean'}},\n    \"enabled\": {{faker 'datatype.boolean'}}\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "bf54c6e4-f2c5-4583-9e13-7677bb336283",
+          "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"role\": \"USER\",\n    \"avatarURL\": null,\n    \"username\": \"sebas@topwatch.com\",\n    \"authorities\": [\n      {\n        \"authority\": \"ROLE_USER\"\n      }\n    ],\n    \"accountNonExpired\": true,\n    \"accountNonLocked\": true,\n    \"credentialsNonExpired\": true,\n    \"enabled\": true\n  },\n  {\n    \"id\": 2,\n    \"name\": null,\n    \"lastname\": null,\n    \"nickname\": \"otheruser\",\n    \"gender\": null,\n    \"email\": \"other@topwatch.com\",\n    \"role\": \"USER\",\n    \"avatarURL\": null,\n    \"username\": \"other@topwatch.com\",\n    \"authorities\": [\n      {\n        \"authority\": \"ROLE_USER\"\n      }\n    ],\n    \"accountNonExpired\": true,\n    \"accountNonLocked\": true,\n    \"credentialsNonExpired\": true,\n    \"enabled\": true\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "cb9e6caf-853d-4029-b245-1668a3af19cf",
+      "type": "http",
+      "documentation": "Get given user",
+      "method": "get",
+      "endpoint": "api/v1/users/user/:id",
+      "responses": [
+        {
+          "uuid": "d4e21ec3-42a0-4132-aa3e-dd5ceaffd5e9",
+          "body": "{\n  \"id\": {{faker 'number.int' max=99999}},\n  \"name\": \"\",\n  \"lastname\": \"\",\n  \"nickname\": \"\",\n  \"gender\": \"{{oneOf 'MALE' 'FEMALE' 'OTHER' 'NOT_SAYED'}}\",\n  \"email\": \"\",\n  \"role\": \"{{oneOf 'USER' 'ADMIN'}}\",\n  \"avatarURL\": \"\",\n  \"username\": \"\",\n  \"authorities\": [\n    {\n      \"authority\": \"\"\n    }\n  ],\n  \"accountNonExpired\": {{faker 'datatype.boolean'}},\n  \"accountNonLocked\": {{faker 'datatype.boolean'}},\n  \"credentialsNonExpired\": {{faker 'datatype.boolean'}},\n  \"enabled\": {{faker 'datatype.boolean'}}\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "600aa083-6265-4539-9bb0-25ea9d794141",
+          "body": "{\n  \"id\": 1,\n  \"name\": \"Sebastian\",\n  \"lastname\": \"Becerra\",\n  \"nickname\": \"sebas\",\n  \"gender\": \"MALE\",\n  \"email\": \"sebas@topwatch.com\",\n  \"role\": \"USER\",\n  \"avatarURL\": null,\n  \"username\": \"sebas@topwatch.com\",\n  \"authorities\": [\n    {\n      \"authority\": \"ROLE_USER\"\n    }\n  ],\n  \"accountNonExpired\": true,\n  \"accountNonLocked\": true,\n  \"credentialsNonExpired\": true,\n  \"enabled\": true\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "8c0e7c13-1e58-43ab-ab9c-102d494f0ccf",
+          "body": "",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "Not Found",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "149fdbc5-0e11-42b8-82b6-aafea0bc9f5c",
+      "type": "http",
+      "documentation": "Delete current user",
+      "method": "post",
+      "endpoint": "api/v1/users/delete/:id",
+      "responses": [
+        {
+          "uuid": "12cd1200-6d91-4a75-8332-50f6ab70194d",
+          "body": "",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "46041372-b028-4f0c-b163-f6bb76856406",
+          "body": "",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "Not Found",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "176b14e5-14f2-4d0a-9d91-71fa65c29ad1"
+    },
+    {
+      "type": "route",
+      "uuid": "f141ceec-416f-4f4b-8c08-4727878a81d3"
+    },
+    {
+      "type": "route",
+      "uuid": "1923702d-b073-412d-999b-343ce77b1f49"
+    },
+    {
+      "type": "route",
+      "uuid": "a0309542-faa8-455f-8fcb-807a2d68a65b"
+    },
+    {
+      "type": "route",
+      "uuid": "3d2a790a-dc0b-41d2-b3fe-22d6e2c4dff4"
+    },
+    {
+      "type": "route",
+      "uuid": "05b9b1fa-fe74-4099-808a-51a455938303"
+    },
+    {
+      "type": "route",
+      "uuid": "0c778408-67ad-4763-b730-1c5fbb63fb0f"
+    },
+    {
+      "type": "route",
+      "uuid": "c5aed61e-7f7f-4ed3-9903-49d62e333fba"
+    },
+    {
+      "type": "route",
+      "uuid": "cb9e6caf-853d-4029-b245-1668a3af19cf"
+    },
+    {
+      "type": "route",
+      "uuid": "149fdbc5-0e11-42b8-82b6-aafea0bc9f5c"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}
