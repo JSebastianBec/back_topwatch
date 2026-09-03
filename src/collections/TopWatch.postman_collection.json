@@ -2,14 +2,16 @@
   "info": {
     "_postman_id": "b6b1a6e0-6b0a-4c7a-9b1a-topwatch00001",
     "name": "TopWatch API",
-    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout) and user management (profile, list, get, delete). Test scripts on the auth requests automatically save accessToken/refreshToken/userId as collection variables so the rest of the requests work out of the box.",
+    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete) and items (create, list, get, search). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId as collection variables so the rest of the requests work out of the box.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "base_url", "value": "http://localhost:8080", "type": "string" },
     { "key": "access_token", "value": "", "type": "string" },
     { "key": "refresh_token", "value": "", "type": "string" },
-    { "key": "user_id", "value": "", "type": "string" }
+    { "key": "user_id", "value": "", "type": "string" },
+    { "key": "category_id", "value": "1", "type": "string" },
+    { "key": "item_id", "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -626,6 +628,239 @@
               "_postman_previewlanguage": "text",
               "header": [],
               "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "Create Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('item_id', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Dune\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"categoryIds\": [{{category_id}}]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/items",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "items" ]
+            },
+            "description": "Creates an item owned by the authenticated user. type is one of BOOKS, SERIES, MOVIES, MUSIC. categoryIds is optional; omit or send [] for no categories. Saves the new id into {{item_id}} automatically."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Dune\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"categoryIds\": [1]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items" ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Dune\",\n    \"creationDate\": \"2026-08-27T15:04:00Z\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"creator\": {\n        \"id\": 1,\n        \"nickname\": \"sebas\"\n    },\n    \"categories\": [\n        {\n            \"id\": 1,\n            \"name\": \"Sci-Fi\",\n            \"description\": \"Science fiction\"\n        }\n    ]\n}"
+            },
+            {
+              "name": "400 Bad Request - Missing name or type",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"description\": \"Missing name and type\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"name\": \"Name is required\",\n    \"type\": \"Type is required\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Category id does not exist",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Dune\",\n    \"type\": \"BOOKS\",\n    \"categoryIds\": [999]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"One or more category ids do not exist\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Item By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/{{item_id}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "items", "{{item_id}}" ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/1",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items", "1" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Dune\",\n    \"creationDate\": \"2026-08-27T15:04:00Z\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"creator\": {\n        \"id\": 1,\n        \"nickname\": \"sebas\"\n    },\n    \"categories\": [\n        {\n            \"id\": 1,\n            \"name\": \"Sci-Fi\",\n            \"description\": \"Science fiction\"\n        }\n    ]\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/999",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items", "999" ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Get All Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/items",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "items" ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Dune\",\n        \"creationDate\": \"2026-08-27T15:04:00Z\",\n        \"description\": \"Sci-fi novel by Frank Herbert\",\n        \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n        \"type\": \"BOOKS\",\n        \"creator\": {\n            \"id\": 1,\n            \"nickname\": \"sebas\"\n        },\n        \"categories\": [\n            {\n                \"id\": 1,\n                \"name\": \"Sci-Fi\",\n                \"description\": \"Science fiction\"\n            }\n        ]\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Blade Runner\",\n        \"creationDate\": \"2026-08-27T15:10:00Z\",\n        \"description\": \"Sci-fi film\",\n        \"urlAvatar\": null,\n        \"type\": \"MOVIES\",\n        \"creator\": {\n            \"id\": 1,\n            \"nickname\": \"sebas\"\n        },\n        \"categories\": []\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Search Items By Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/search?name=dune",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "items", "search" ],
+              "query": [ { "key": "name", "value": "dune" } ]
+            },
+            "description": "Case-insensitive partial match on the item name."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/search?name=dune",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "items", "search" ],
+                  "query": [ { "key": "name", "value": "dune" } ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Dune\",\n        \"creationDate\": \"2026-08-27T15:04:00Z\",\n        \"description\": \"Sci-fi novel by Frank Herbert\",\n        \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n        \"type\": \"BOOKS\",\n        \"creator\": {\n            \"id\": 1,\n            \"nickname\": \"sebas\"\n        },\n        \"categories\": [\n            {\n                \"id\": 1,\n                \"name\": \"Sci-Fi\",\n                \"description\": \"Science fiction\"\n            }\n        ]\n    }\n]"
             }
           ]
         }

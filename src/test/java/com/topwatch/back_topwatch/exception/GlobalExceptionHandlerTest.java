@@ -37,6 +37,15 @@ class GlobalExceptionHandlerTest {
                 handler.handleDataIntegrityViolation(new DataIntegrityViolationException("constraint violation"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(response.getBody()).containsEntry("message", "Email or nickname is already in use");
+        assertThat(response.getBody()).containsEntry("message", "A unique or required field constraint was violated");
+    }
+
+    @Test
+    void handleBadRequest_returnsBadRequestWithMessage() {
+        ResponseEntity<Map<String, String>> response =
+                handler.handleBadRequest(new BadRequestException("Item name is required"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).containsEntry("message", "Item name is required");
     }
 }

@@ -1,0 +1,636 @@
+swagger: '2.0'
+info:
+  title: TopWatch API
+  description: Auth, user management and item endpoints for the back_topwatch service,
+    for import into Mockoon (Environment creation menu > New local environment from
+    OpenAPI/Swagger).
+  version: 1.1.0
+host: localhost:8080
+basePath: /
+schemes:
+- http
+consumes:
+- application/json
+produces:
+- application/json
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: 'Send as: Bearer <token>'
+definitions:
+  RegisterRequest:
+    type: object
+    required:
+    - email
+    - password
+    - nickname
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      nickname:
+        type: string
+  LoginRequest:
+    type: object
+    required:
+    - email
+    - password
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  LogoutRequest:
+    type: object
+    properties:
+      refreshToken:
+        type: string
+  UpdateUserRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      lastname:
+        type: string
+      nickname:
+        type: string
+      gender:
+        type: string
+        enum:
+        - MALE
+        - FEMALE
+        - OTHER
+        - NOT_SAYED
+      email:
+        type: string
+      password:
+        type: string
+      avatarURL:
+        type: string
+  AuthResponse:
+    type: object
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+  Authority:
+    type: object
+    properties:
+      authority:
+        type: string
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      lastname:
+        type: string
+      nickname:
+        type: string
+      gender:
+        type: string
+        enum:
+        - MALE
+        - FEMALE
+        - OTHER
+        - NOT_SAYED
+      email:
+        type: string
+      role:
+        type: string
+        enum:
+        - USER
+        - ADMIN
+      avatarURL:
+        type: string
+      username:
+        type: string
+      authorities:
+        type: array
+        items:
+          $ref: '#/definitions/Authority'
+      accountNonExpired:
+        type: boolean
+      accountNonLocked:
+        type: boolean
+      credentialsNonExpired:
+        type: boolean
+      enabled:
+        type: boolean
+  ErrorMessage:
+    type: object
+    properties:
+      message:
+        type: string
+  CreateItemRequest:
+    type: object
+    required:
+    - name
+    - type
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      urlAvatar:
+        type: string
+      type:
+        type: string
+        enum:
+        - BOOKS
+        - SERIES
+        - MOVIES
+        - MUSIC
+      categoryIds:
+        type: array
+        items:
+          type: integer
+          format: int64
+  ItemCreatorSummary:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      nickname:
+        type: string
+  ItemCategorySummary:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      description:
+        type: string
+  ItemResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      creationDate:
+        type: string
+        format: date-time
+      description:
+        type: string
+      urlAvatar:
+        type: string
+      type:
+        type: string
+        enum:
+        - BOOKS
+        - SERIES
+        - MOVIES
+        - MUSIC
+      creator:
+        $ref: '#/definitions/ItemCreatorSummary'
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/ItemCategorySummary'
+paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register user
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/AuthResponse'
+          examples:
+            application/json:
+              accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJpYXQiOjE3NTUzMDAwMDAsImV4cCI6MTc1NTMwMDkwMH0.EXAMPLE-SIGNATURE-1
+              refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmNmU1ZDQtYzNiMi1hMTAwLTk4NzYtNTQzMjEwZmVkY2JhIiwiaWF0IjoxNzU1MzAwMDAwLCJleHAiOjE3NTU5MDQ4MDB9.EXAMPLE-SIGNATURE-2
+        '409':
+          description: Conflict - email or nickname already in use
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+          examples:
+            application/json:
+              message: Email or nickname is already in use
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/AuthResponse'
+          examples:
+            application/json:
+              accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJpYXQiOjE3NTUzMDAwMDAsImV4cCI6MTc1NTMwMDkwMH0.EXAMPLE-SIGNATURE-1
+              refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJmNmU1ZDQtYzNiMi1hMTAwLTk4NzYtNTQzMjEwZmVkY2JhIiwiaWF0IjoxNzU1MzAwMDAwLCJleHAiOjE3NTU5MDQ4MDB9.EXAMPLE-SIGNATURE-2
+        '401':
+          description: Unauthorized - bad credentials
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+          examples:
+            application/json:
+              message: Bad credentials
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - Auth
+      summary: Refresh tokens
+      description: The refresh token (not the access token) is sent as a Bearer token
+        in the Authorization header.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/AuthResponse'
+          examples:
+            application/json:
+              accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJhYWJiY2NkZC0xMTIyLTMzNDQtNTU2Ni03Nzg4OTlhYWJiY2MiLCJpYXQiOjE3NTUzMDA5MDAsImV4cCI6MTc1NTMwMTgwMH0.EXAMPLE-SIGNATURE-3
+              refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWJhc0B0b3B3YXRjaC5jb20iLCJqdGkiOiJkZGVlZmYwMC0zMzQ0LTU1NjYtNzc4OC05OWFhYmJjY2RkZWUiLCJpYXQiOjE3NTUzMDA5MDAsImV4cCI6MTc1NTkwNTcwMH0.EXAMPLE-SIGNATURE-4
+        '401':
+          description: Unauthorized - missing header, invalid or revoked refresh token
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+          examples:
+            application/json:
+              message: Refresh token has been revoked
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout
+      description: Revokes the access token in the Authorization header and, optionally,
+        the refresh token in the body.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: body
+        in: body
+        required: false
+        schema:
+          $ref: '#/definitions/LogoutRequest'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized - missing Authorization header
+  /api/v1/users/health:
+    get:
+      tags:
+      - Users
+      summary: Health check
+      produces:
+      - text/plain
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+          examples:
+            text/plain: Hello world
+  /api/v1/users/me:
+    get:
+      tags:
+      - Users
+      summary: Get current user
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+          examples:
+            application/json:
+              id: 1
+              name: null
+              lastname: null
+              nickname: sebas
+              gender: null
+              email: sebas@topwatch.com
+              role: USER
+              avatarURL: null
+              username: sebas@topwatch.com
+              authorities:
+              - authority: ROLE_USER
+              accountNonExpired: true
+              accountNonLocked: true
+              credentialsNonExpired: true
+              enabled: true
+    patch:
+      tags:
+      - Users
+      summary: Update current user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+          examples:
+            application/json:
+              id: 1
+              name: Sebastian
+              lastname: Becerra
+              nickname: sebas
+              gender: MALE
+              email: sebas@topwatch.com
+              role: USER
+              avatarURL: https://cdn.topwatch.com/avatars/sebas.png
+              username: sebas@topwatch.com
+              authorities:
+              - authority: ROLE_USER
+              accountNonExpired: true
+              accountNonLocked: true
+              credentialsNonExpired: true
+              enabled: true
+        '409':
+          description: Conflict - nickname or email already in use
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+          examples:
+            application/json:
+              message: Nickname is already in use
+  /api/v1/users/users:
+    get:
+      tags:
+      - Users
+      summary: Return all users
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+          examples:
+            application/json:
+            - id: 1
+              name: Sebastian
+              lastname: Becerra
+              nickname: sebas
+              gender: MALE
+              email: sebas@topwatch.com
+              role: USER
+              avatarURL: null
+              username: sebas@topwatch.com
+              authorities:
+              - authority: ROLE_USER
+              accountNonExpired: true
+              accountNonLocked: true
+              credentialsNonExpired: true
+              enabled: true
+            - id: 2
+              name: null
+              lastname: null
+              nickname: otheruser
+              gender: null
+              email: other@topwatch.com
+              role: USER
+              avatarURL: null
+              username: other@topwatch.com
+              authorities:
+              - authority: ROLE_USER
+              accountNonExpired: true
+              accountNonLocked: true
+              credentialsNonExpired: true
+              enabled: true
+  /api/v1/users/user/{id}:
+    get:
+      tags:
+      - Users
+      summary: Get given user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+          examples:
+            application/json:
+              id: 1
+              name: Sebastian
+              lastname: Becerra
+              nickname: sebas
+              gender: MALE
+              email: sebas@topwatch.com
+              role: USER
+              avatarURL: null
+              username: sebas@topwatch.com
+              authorities:
+              - authority: ROLE_USER
+              accountNonExpired: true
+              accountNonLocked: true
+              credentialsNonExpired: true
+              enabled: true
+        '404':
+          description: Not Found
+  /api/v1/users/delete/{id}:
+    post:
+      tags:
+      - Users
+      summary: Delete current user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int64
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+  /api/v1/items:
+    post:
+      tags:
+      - Items
+      summary: Create item
+      description: Creates a new item owned by the authenticated user.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateItemRequest'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/ItemResponse'
+          examples:
+            application/json:
+              id: 1
+              name: Dune
+              creationDate: '2026-08-27T15:04:00Z'
+              description: Sci-fi novel by Frank Herbert
+              urlAvatar: https://cdn.topwatch.com/items/dune.png
+              type: BOOKS
+              creator:
+                id: 1
+                nickname: sebas
+              categories:
+              - id: 1
+                name: Sci-Fi
+                description: Science fiction
+        '400':
+          description: Bad Request - missing name/type, or a category id does not
+            exist
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+          examples:
+            application/json:
+              message: One or more category ids do not exist
+    get:
+      tags:
+      - Items
+      summary: Get all items
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ItemResponse'
+          examples:
+            application/json:
+            - id: 1
+              name: Dune
+              creationDate: '2026-08-27T15:04:00Z'
+              description: Sci-fi novel by Frank Herbert
+              urlAvatar: https://cdn.topwatch.com/items/dune.png
+              type: BOOKS
+              creator:
+                id: 1
+                nickname: sebas
+              categories:
+              - id: 1
+                name: Sci-Fi
+                description: Science fiction
+            - id: 2
+              name: Blade Runner
+              creationDate: '2026-08-27T15:10:00Z'
+              description: Sci-fi film
+              urlAvatar: null
+              type: MOVIES
+              creator:
+                id: 1
+                nickname: sebas
+              categories: []
+  /api/v1/items/{id}:
+    get:
+      tags:
+      - Items
+      summary: Get item by id
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ItemResponse'
+          examples:
+            application/json:
+              id: 1
+              name: Dune
+              creationDate: '2026-08-27T15:04:00Z'
+              description: Sci-fi novel by Frank Herbert
+              urlAvatar: https://cdn.topwatch.com/items/dune.png
+              type: BOOKS
+              creator:
+                id: 1
+                nickname: sebas
+              categories:
+              - id: 1
+                name: Sci-Fi
+                description: Science fiction
+        '404':
+          description: Not Found
+  /api/v1/items/search:
+    get:
+      tags:
+      - Items
+      summary: Search items by name
+      description: Case-insensitive partial match on the item name.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: name
+        in: query
+        required: true
+        type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ItemResponse'
+          examples:
+            application/json:
+            - id: 1
+              name: Dune
+              creationDate: '2026-08-27T15:04:00Z'
+              description: Sci-fi novel by Frank Herbert
+              urlAvatar: https://cdn.topwatch.com/items/dune.png
+              type: BOOKS
+              creator:
+                id: 1
+                nickname: sebas
+              categories:
+              - id: 1
+                name: Sci-Fi
+                description: Science fiction
