@@ -32,7 +32,7 @@ public class ItemController {
             description = "Creates a new item owned by the authenticated user",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<ItemResponse> createItem(
             @Valid @RequestBody CreateItemRequest request,
             @AuthenticationPrincipal User currentUser
@@ -41,7 +41,9 @@ public class ItemController {
                 .name(request.name())
                 .description(request.description())
                 .urlAvatar(request.urlAvatar())
+                .type(request.type())
                 .creator(currentUser)
+                .categories(itemService.resolveCategories(request.categoryIds()))
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(itemService.saveItem(item)));

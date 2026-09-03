@@ -799,6 +799,318 @@
       "responseMode": null,
       "streamingMode": null,
       "streamingInterval": 0
+    },
+    {
+      "uuid": "80c75883-2697-4daf-8ee4-b58168a1bcdc",
+      "type": "http",
+      "documentation": "Create item",
+      "method": "post",
+      "endpoint": "api/v1/items",
+      "responses": [
+        {
+          "uuid": "b3a3d527-76d6-4556-afa3-20dd850e1b26",
+          "body": "{\n  \"id\": {{faker 'number.int' max=99999}},\n  \"name\": \"\",\n  \"creationDate\": \"{{faker 'date.recent'}}\",\n  \"description\": \"\",\n  \"urlAvatar\": \"\",\n  \"type\": \"{{oneOf 'BOOKS' 'SERIES' 'MOVIES' 'MUSIC'}}\",\n  \"creator\": {\n    \"id\": {{faker 'number.int' max=99999}},\n    \"nickname\": \"\"\n  },\n  \"categories\": [\n    {\n      \"id\": {{faker 'number.int' max=99999}},\n      \"name\": \"\",\n      \"description\": \"\"\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "Created",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "8fdfee2f-162a-47c2-b534-048eed2b7fed",
+          "body": "{\n  \"id\": 1,\n  \"name\": \"Dune\",\n  \"creationDate\": \"2026-08-27T15:04:00Z\",\n  \"description\": \"Sci-fi novel by Frank Herbert\",\n  \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n  \"type\": \"BOOKS\",\n  \"creator\": {\n    \"id\": 1,\n    \"nickname\": \"sebas\"\n  },\n  \"categories\": [\n    {\n      \"id\": 1,\n      \"name\": \"Sci-Fi\",\n      \"description\": \"Science fiction\"\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "c407b391-4bea-4545-8fe3-651ea2a8ca3c",
+          "body": "{\n  \"name\": \"Name is required\",\n  \"type\": \"Type is required\"\n}",
+          "latency": 0,
+          "statusCode": 400,
+          "label": "Bad Request - missing name or type",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "14694dca-b896-45d1-a980-dfc1ec7d73a6",
+          "body": "{\n  \"message\": \"One or more category ids do not exist\"\n}",
+          "latency": 0,
+          "statusCode": 400,
+          "label": "Bad Request - category id does not exist",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "b1f1720b-d0f2-4803-804f-cee97d463066",
+      "type": "http",
+      "documentation": "Get item by id",
+      "method": "get",
+      "endpoint": "api/v1/items/:id",
+      "responses": [
+        {
+          "uuid": "794fbe8c-928c-410c-9160-a5bc1799f847",
+          "body": "{\n  \"id\": {{faker 'number.int' max=99999}},\n  \"name\": \"\",\n  \"creationDate\": \"{{faker 'date.recent'}}\",\n  \"description\": \"\",\n  \"urlAvatar\": \"\",\n  \"type\": \"{{oneOf 'BOOKS' 'SERIES' 'MOVIES' 'MUSIC'}}\",\n  \"creator\": {\n    \"id\": {{faker 'number.int' max=99999}},\n    \"nickname\": \"\"\n  },\n  \"categories\": [\n    {\n      \"id\": {{faker 'number.int' max=99999}},\n      \"name\": \"\",\n      \"description\": \"\"\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "b0dc0020-69df-4fb2-a862-ac76634149b7",
+          "body": "{\n  \"id\": 1,\n  \"name\": \"Dune\",\n  \"creationDate\": \"2026-08-27T15:04:00Z\",\n  \"description\": \"Sci-fi novel by Frank Herbert\",\n  \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n  \"type\": \"BOOKS\",\n  \"creator\": {\n    \"id\": 1,\n    \"nickname\": \"sebas\"\n  },\n  \"categories\": [\n    {\n      \"id\": 1,\n      \"name\": \"Sci-Fi\",\n      \"description\": \"Science fiction\"\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "d977245d-b6b3-4056-8f59-7a3152f8167e",
+          "body": "",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "Not Found",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "2bd0f84f-6a78-476d-a307-e7e43062d50d",
+      "type": "http",
+      "documentation": "Get all items",
+      "method": "get",
+      "endpoint": "api/v1/items",
+      "responses": [
+        {
+          "uuid": "e6c2eb84-bc9b-4022-aa25-822f06683072",
+          "body": "[\n  {\n    \"id\": {{faker 'number.int' max=99999}},\n    \"name\": \"\",\n    \"creationDate\": \"{{faker 'date.recent'}}\",\n    \"description\": \"\",\n    \"urlAvatar\": \"\",\n    \"type\": \"{{oneOf 'BOOKS' 'SERIES' 'MOVIES' 'MUSIC'}}\",\n    \"creator\": {\n      \"id\": {{faker 'number.int' max=99999}},\n      \"nickname\": \"\"\n    },\n    \"categories\": [\n      {\n        \"id\": {{faker 'number.int' max=99999}},\n        \"name\": \"\",\n        \"description\": \"\"\n      }\n    ]\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "36d0ba8f-cf95-4c13-a84f-f0b2e31c477c",
+          "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Dune\",\n    \"creationDate\": \"2026-08-27T15:04:00Z\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"creator\": {\n      \"id\": 1,\n      \"nickname\": \"sebas\"\n    },\n    \"categories\": [\n      {\n        \"id\": 1,\n        \"name\": \"Sci-Fi\",\n        \"description\": \"Science fiction\"\n      }\n    ]\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Blade Runner\",\n    \"creationDate\": \"2026-08-27T15:10:00Z\",\n    \"description\": \"Sci-fi film\",\n    \"urlAvatar\": null,\n    \"type\": \"MOVIES\",\n    \"creator\": {\n      \"id\": 1,\n      \"nickname\": \"sebas\"\n    },\n    \"categories\": []\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "ea65f50e-b2d2-421e-a330-3890676237e5",
+      "type": "http",
+      "documentation": "Search items by name",
+      "method": "get",
+      "endpoint": "api/v1/items/search",
+      "responses": [
+        {
+          "uuid": "fa26704e-51b2-4a3a-8191-4f6035f02b79",
+          "body": "[\n  {\n    \"id\": {{faker 'number.int' max=99999}},\n    \"name\": \"\",\n    \"creationDate\": \"{{faker 'date.recent'}}\",\n    \"description\": \"\",\n    \"urlAvatar\": \"\",\n    \"type\": \"{{oneOf 'BOOKS' 'SERIES' 'MOVIES' 'MUSIC'}}\",\n    \"creator\": {\n      \"id\": {{faker 'number.int' max=99999}},\n      \"nickname\": \"\"\n    },\n    \"categories\": [\n      {\n        \"id\": {{faker 'number.int' max=99999}},\n        \"name\": \"\",\n        \"description\": \"\"\n      }\n    ]\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "8786bac7-38d3-452a-ac15-2571a45ef3b5",
+          "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Dune\",\n    \"creationDate\": \"2026-08-27T15:04:00Z\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"creator\": {\n      \"id\": 1,\n      \"nickname\": \"sebas\"\n    },\n    \"categories\": [\n      {\n        \"id\": 1,\n        \"name\": \"Sci-Fi\",\n        \"description\": \"Science fiction\"\n      }\n    ]\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
     }
   ],
   "rootChildren": [
@@ -841,6 +1153,22 @@
     {
       "type": "route",
       "uuid": "149fdbc5-0e11-42b8-82b6-aafea0bc9f5c"
+    },
+    {
+      "type": "route",
+      "uuid": "80c75883-2697-4daf-8ee4-b58168a1bcdc"
+    },
+    {
+      "type": "route",
+      "uuid": "b1f1720b-d0f2-4803-804f-cee97d463066"
+    },
+    {
+      "type": "route",
+      "uuid": "2bd0f84f-6a78-476d-a307-e7e43062d50d"
+    },
+    {
+      "type": "route",
+      "uuid": "ea65f50e-b2d2-421e-a330-3890676237e5"
     }
   ],
   "proxyMode": false,

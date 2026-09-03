@@ -1,5 +1,6 @@
 package com.topwatch.back_topwatch.domain;
 
+import com.topwatch.back_topwatch.domain.enums.Type;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,5 +23,9 @@ public class Category {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
 
 }
