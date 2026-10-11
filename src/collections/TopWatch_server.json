@@ -1111,6 +1111,90 @@
       "responseMode": null,
       "streamingMode": null,
       "streamingInterval": 0
+    },
+    {
+      "uuid": "7c7216b9-20b0-471e-b679-a8a797114449",
+      "type": "http",
+      "documentation": "Get categories",
+      "method": "get",
+      "endpoint": "api/v1/categories",
+      "responses": [
+        {
+          "uuid": "46fa42d9-4595-45ec-882e-1f03a430cd0e",
+          "body": "[\n  {\n    \"id\": {{faker 'number.int' max=99999}},\n    \"name\": \"\",\n    \"description\": \"\",\n    \"type\": \"{{oneOf 'BOOKS' 'SERIES' 'MOVIES' 'MUSIC'}}\"\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "OK",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "14a911d9-4aa2-4aeb-a62e-27fd153f7c20",
+          "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Sci-Fi\",\n    \"description\": \"Science fiction movies\",\n    \"type\": \"MOVIES\"\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Fantasy\",\n    \"description\": \"Fantasy books\",\n    \"type\": \"BOOKS\"\n  },\n  {\n    \"id\": 3,\n    \"name\": \"Rock\",\n    \"description\": \"Rock music\",\n    \"type\": \"MUSIC\"\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "application/json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "dfe02be0-5c60-444a-a51e-53417c202b9e",
+          "body": "{\n  \"message\": \"Invalid value 'BOOKZ' for parameter 'type'. Allowed values: BOOKS, SERIES, MOVIES, MUSIC\"\n}",
+          "latency": 0,
+          "statusCode": 400,
+          "label": "Bad Request - invalid type value",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
     }
   ],
   "rootChildren": [
@@ -1169,6 +1253,10 @@
     {
       "type": "route",
       "uuid": "ea65f50e-b2d2-421e-a330-3890676237e5"
+    },
+    {
+      "type": "route",
+      "uuid": "7c7216b9-20b0-471e-b679-a8a797114449"
     }
   ],
   "proxyMode": false,

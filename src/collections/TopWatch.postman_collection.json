@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "b6b1a6e0-6b0a-4c7a-9b1a-topwatch00001",
     "name": "TopWatch API",
-    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete) and items (create, list, get, search). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId as collection variables so the rest of the requests work out of the box.",
+    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete), items (create, list, get, search), categories (list, filter by type) and watch lists (create, list, detail with associated items). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId/watchListId as collection variables so the rest of the requests work out of the box.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -11,7 +11,8 @@
     { "key": "refresh_token", "value": "", "type": "string" },
     { "key": "user_id", "value": "", "type": "string" },
     { "key": "category_id", "value": "1", "type": "string" },
-    { "key": "item_id", "value": "", "type": "string" }
+    { "key": "item_id", "value": "", "type": "string" },
+    { "key": "watch_list_id", "value": "1", "type": "string" }
   ],
   "item": [
     {
@@ -352,7 +353,7 @@
           "name": "Health Check",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
             "url": {
               "raw": "{{base_url}}/api/v1/users/health",
               "host": [ "{{base_url}}" ],
@@ -437,7 +438,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"newPassword123\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}",
+              "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {
@@ -458,7 +459,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"password\": \"newPassword123\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}"
+                  "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/v1/users/me",
@@ -664,9 +665,9 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/items",
+              "raw": "{{base_url}}/api/v1/items/save",
               "host": [ "{{base_url}}" ],
-              "path": [ "api", "v1", "items" ]
+              "path": [ "api", "v1", "items", "save" ]
             },
             "description": "Creates an item owned by the authenticated user. type is one of BOOKS, SERIES, MOVIES, MUSIC. categoryIds is optional; omit or send [] for no categories. Saves the new id into {{item_id}} automatically."
           },
@@ -684,9 +685,9 @@
                   "raw": "{\n    \"name\": \"Dune\",\n    \"description\": \"Sci-fi novel by Frank Herbert\",\n    \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n    \"type\": \"BOOKS\",\n    \"categoryIds\": [1]\n}"
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v1/items",
+                  "raw": "{{base_url}}/api/v1/items/save",
                   "host": [ "{{base_url}}" ],
-                  "path": [ "api", "v1", "items" ]
+                  "path": [ "api", "v1", "items", "save" ]
                 }
               },
               "status": "Created",
@@ -708,9 +709,9 @@
                   "raw": "{\n    \"description\": \"Missing name and type\"\n}"
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v1/items",
+                  "raw": "{{base_url}}/api/v1/items/save",
                   "host": [ "{{base_url}}" ],
-                  "path": [ "api", "v1", "items" ]
+                  "path": [ "api", "v1", "items", "save" ]
                 }
               },
               "status": "Bad Request",
@@ -732,9 +733,9 @@
                   "raw": "{\n    \"name\": \"Dune\",\n    \"type\": \"BOOKS\",\n    \"categoryIds\": [999]\n}"
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v1/items",
+                  "raw": "{{base_url}}/api/v1/items/save",
                   "host": [ "{{base_url}}" ],
-                  "path": [ "api", "v1", "items" ]
+                  "path": [ "api", "v1", "items", "save" ]
                 }
               },
               "status": "Bad Request",
@@ -861,6 +862,290 @@
               "_postman_previewlanguage": "json",
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
               "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Dune\",\n        \"creationDate\": \"2026-08-27T15:04:00Z\",\n        \"description\": \"Sci-fi novel by Frank Herbert\",\n        \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n        \"type\": \"BOOKS\",\n        \"creator\": {\n            \"id\": 1,\n            \"nickname\": \"sebas\"\n        },\n        \"categories\": [\n            {\n                \"id\": 1,\n                \"name\": \"Sci-Fi\",\n                \"description\": \"Science fiction\"\n            }\n        ]\n    }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "categories" ]
+            },
+            "description": "Returns every category. Add a ?type=... query param to filter (see 'Get Categories By Type')."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/categories",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "categories" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Sci-Fi\",\n        \"description\": \"Science fiction movies\",\n        \"type\": \"MOVIES\"\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Fantasy\",\n        \"description\": \"Fantasy books\",\n        \"type\": \"BOOKS\"\n    },\n    {\n        \"id\": 3,\n        \"name\": \"Rock\",\n        \"description\": \"Rock music\",\n        \"type\": \"MUSIC\"\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Categories By Type",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories?type=MOVIES",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "categories" ],
+              "query": [ { "key": "type", "value": "MOVIES" } ]
+            },
+            "description": "type is one of BOOKS, SERIES, MOVIES, MUSIC."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/categories?type=MOVIES",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "categories" ],
+                  "query": [ { "key": "type", "value": "MOVIES" } ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Sci-Fi\",\n        \"description\": \"Science fiction movies\",\n        \"type\": \"MOVIES\"\n    },\n    {\n        \"id\": 4,\n        \"name\": \"Action\",\n        \"description\": \"Action movies\",\n        \"type\": \"MOVIES\"\n    }\n]"
+            },
+            {
+              "name": "400 Bad Request - Invalid type",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/categories?type=BOOKZ",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "categories" ],
+                  "query": [ { "key": "type", "value": "BOOKZ" } ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Invalid value 'BOOKZ' for parameter 'type'. Allowed values: BOOKS, SERIES, MOVIES, MUSIC\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Watch Lists",
+      "item": [
+        {
+          "name": "Get All Watch Lists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (Array.isArray(json) && json.length > 0) {",
+                  "        pm.collectionVariables.set('watch_list_id', json[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "watch-lists" ]
+            },
+            "description": "Returns every watch list with only id and name. Saves the first list's id into {{watch_list_id}} automatically."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Para el finde\"\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Clasicos de ciencia ficcion\"\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create Watch List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('watch_list_id', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Para el finde\",\n    \"description\": \"Peliculas y series pendientes\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists/save",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "watch-lists", "save" ]
+            },
+            "description": "Creates a watch list owned by the authenticated user. Saves the new id into {{watch_list_id}} automatically."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Para el finde\",\n    \"description\": \"Peliculas y series pendientes\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/save",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "save" ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Missing name",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{access_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"description\": \"Missing name\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/save",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "save" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"name\": \"Name is required\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Watch List Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists/{{watch_list_id}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "watch-lists", "{{watch_list_id}}" ]
+            },
+            "description": "Returns the watch list plus the items associated with it (each with its own watched/watchedDate/description and the full item)."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\",\n    \"creationDate\": \"2026-09-01T10:00:00Z\",\n    \"description\": null,\n    \"creator\": {\n        \"id\": 1,\n        \"nickname\": \"sebas\"\n    },\n    \"items\": [\n        {\n            \"id\": 5,\n            \"watched\": false,\n            \"watchedDate\": null,\n            \"description\": null,\n            \"item\": {\n                \"id\": 1,\n                \"name\": \"Dune\",\n                \"creationDate\": \"2026-08-27T15:04:00Z\",\n                \"description\": \"Sci-fi novel by Frank Herbert\",\n                \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n                \"type\": \"BOOKS\",\n                \"creator\": {\n                    \"id\": 1,\n                    \"nickname\": \"sebas\"\n                },\n                \"categories\": [\n                    {\n                        \"id\": 1,\n                        \"name\": \"Sci-Fi\",\n                        \"description\": \"Science fiction\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/999",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "999" ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
             }
           ]
         }
