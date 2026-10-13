@@ -23,7 +23,19 @@ public record WatchListDetailResponse(
             Instant watchedDate,
             String description,
             ItemResponse item
-    ) {}
+    ) {
+
+        public static WatchListItemEntry from(WatchListItem watchListItem) {
+            return new WatchListItemEntry(
+                    watchListItem.getId(),
+                    watchListItem.getWatched(),
+                    watchListItem.getWatchedDate(),
+                    watchListItem.getDescription(),
+                    ItemResponse.from(watchListItem.getItem())
+            );
+        }
+
+    }
 
     public static WatchListDetailResponse from(WatchList watchList, List<WatchListItem> watchListItems) {
         CreatorSummary creator = watchList.getCreator() != null
@@ -31,13 +43,7 @@ public record WatchListDetailResponse(
                 : null;
 
         List<WatchListItemEntry> items = watchListItems.stream()
-                .map(watchListItem -> new WatchListItemEntry(
-                        watchListItem.getId(),
-                        watchListItem.getWatched(),
-                        watchListItem.getWatchedDate(),
-                        watchListItem.getDescription(),
-                        ItemResponse.from(watchListItem.getItem())
-                ))
+                .map(WatchListItemEntry::from)
                 .toList();
 
         return new WatchListDetailResponse(

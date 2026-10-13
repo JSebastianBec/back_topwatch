@@ -2,6 +2,7 @@ package com.topwatch.back_topwatch.controller;
 
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.domain.WatchList;
+import com.topwatch.back_topwatch.dto.AddWatchListItemsRequest;
 import com.topwatch.back_topwatch.dto.CreateWatchListRequest;
 import com.topwatch.back_topwatch.dto.WatchListDetailResponse;
 import com.topwatch.back_topwatch.dto.WatchListResponse;
@@ -67,6 +68,23 @@ public class WatchListController {
                 .map(watchList -> WatchListDetailResponse.from(watchList, watchListService.findItemsByWatchListId(id)))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(
+            summary = "Add items to watch list",
+            description = "Links one or more existing items (by id) to a watch list owned by the authenticated user. All items are added or none are",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/{id}/items")
+    public ResponseEntity<List<WatchListDetailResponse.WatchListItemEntry>> addItemsToWatchList(
+            @PathVariable Long id,
+            @Valid @RequestBody AddWatchListItemsRequest request,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(watchListService.addItemsToWatchList(id, request.itemIds(), currentUser).stream()
+                        .map(WatchListDetailResponse.WatchListItemEntry::from)
+                        .toList());
     }
 
 }

@@ -1148,6 +1148,170 @@
               "body": ""
             }
           ]
+        },
+        {
+          "name": "Add Items To Watch List",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"itemIds\": [{{item_id}}]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists/{{watch_list_id}}/items",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "watch-lists", "{{watch_list_id}}", "items" ]
+            },
+            "description": "Links one or more existing items (by id) to the watch list {{watch_list_id}}. Each new entry is saved with watched = false, watchedDate = the moment it was added, and no description. All items are added or none are: if any id fails a check, nothing is saved. Only the watch list creator can add items. Possible errors: 400 (empty list, null id, same id twice), 403 (not the owner), 404 (watch list or any item not found), 409 (any item already in the list)."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, 2]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1", "items" ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 5,\n        \"watched\": false,\n        \"watchedDate\": \"2026-10-12T13:30:00Z\",\n        \"description\": null,\n        \"item\": {\n            \"id\": 1,\n            \"name\": \"Dune\",\n            \"creationDate\": \"2026-08-27T15:04:00Z\",\n            \"description\": \"Sci-fi novel by Frank Herbert\",\n            \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n            \"type\": \"BOOKS\",\n            \"creator\": {\n                \"id\": 1,\n                \"nickname\": \"sebas\"\n            },\n            \"categories\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Sci-Fi\",\n                    \"description\": \"Science fiction\"\n                }\n            ]\n        }\n    },\n    {\n        \"id\": 6,\n        \"watched\": false,\n        \"watchedDate\": \"2026-10-12T13:30:00Z\",\n        \"description\": null,\n        \"item\": {\n            \"id\": 2,\n            \"name\": \"Foundation\",\n            \"creationDate\": \"2026-08-28T10:00:00Z\",\n            \"description\": \"Sci-fi novel by Isaac Asimov\",\n            \"urlAvatar\": \"https://cdn.topwatch.com/items/foundation.png\",\n            \"type\": \"BOOKS\",\n            \"creator\": {\n                \"id\": 1,\n                \"nickname\": \"sebas\"\n            },\n            \"categories\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Sci-Fi\",\n                    \"description\": \"Science fiction\"\n                }\n            ]\n        }\n    }\n]"
+            },
+            {
+              "name": "400 Bad Request - Empty list",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": []\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1", "items" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"itemIds\": \"At least one item id is required\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Null id",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, null]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1", "items" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"itemIds[1]\": \"Item id is required\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Repeated id",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, 1]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1", "items" ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Each item can only appear once per request\"\n}"
+            },
+            {
+              "name": "403 Forbidden - Not the owner",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, 2]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/2/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "2", "items" ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Only the watch list creator can add items to it\"\n}"
+            },
+            {
+              "name": "404 Not Found - Watch list",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, 2]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/999/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "999", "items" ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Watch list not found\"\n}"
+            },
+            {
+              "name": "404 Not Found - Items",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, 998, 999]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1", "items" ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Items not found: [998, 999]\"\n}"
+            },
+            {
+              "name": "409 Conflict - Already in list",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n    \"itemIds\": [1, 2]\n}" },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/items",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1", "items" ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"message\": \"Items already in this watch list: [1]\"\n}"
+            }
+          ]
         }
       ]
     }
