@@ -39,6 +39,18 @@ public class WatchListController {
     }
 
     @Operation(
+            summary = "Get my watch lists",
+            description = "Returns the watch lists created by the authenticated user",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @GetMapping("/me")
+    public List<WatchListResponse> getMyWatchLists(@AuthenticationPrincipal User currentUser) {
+        return watchListService.findWatchListsByCreator(currentUser).stream()
+                .map(WatchListResponse::from)
+                .toList();
+    }
+
+    @Operation(
             summary = "Create watch list",
             description = "Creates a new watch list owned by the authenticated user",
             security = @SecurityRequirement(name = "Bearer Token")

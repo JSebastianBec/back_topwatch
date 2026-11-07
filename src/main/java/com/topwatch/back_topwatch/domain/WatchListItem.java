@@ -3,8 +3,6 @@ package com.topwatch.back_topwatch.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"creator", "watchList", "item"})
@@ -19,12 +17,6 @@ public class WatchListItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-
-    @Column(nullable = false)
-    private Boolean watched;
-
-    @Column(name = "watched_date")
-    private Instant watchedDate;
 
     @Column(columnDefinition = "TEXT")
     private String description;

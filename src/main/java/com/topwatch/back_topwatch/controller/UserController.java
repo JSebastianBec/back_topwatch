@@ -49,7 +49,7 @@ public class UserController {
             description = "Updates the authenticated user's profile with the provided fields",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PatchMapping("/me")
+    @PostMapping("/me")
     public ResponseEntity<User> update(
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal User currentUser

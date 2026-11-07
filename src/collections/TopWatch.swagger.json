@@ -535,7 +535,7 @@
           }
         }
       },
-      "patch": {
+      "post": {
         "tags": [
           "Users"
         ],

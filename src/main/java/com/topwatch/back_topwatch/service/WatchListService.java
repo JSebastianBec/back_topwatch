@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,10 @@ public class WatchListService {
 
     public List<WatchList> findAllWatchLists() {
         return watchListRepository.findAll();
+    }
+
+    public List<WatchList> findWatchListsByCreator(@NonNull User creator) {
+        return watchListRepository.findByCreator_Id(creator.getId());
     }
 
     public Optional<WatchList> findWatchListById(@NonNull Long id) {
@@ -93,12 +96,9 @@ public class WatchListService {
             throw new DuplicateResourceException("Items already in this watch list: " + alreadyLinkedItemIds);
         }
 
-        // New entries start unwatched, dated at the moment they are added and without a description
-        Instant addedAt = Instant.now();
+        // New entries start without a description; watched state lives in each user's WatchListView
         List<WatchListItem> watchListItems = itemIds.stream()
                 .map(itemId -> WatchListItem.builder()
-                        .watched(false)
-                        .watchedDate(addedAt)
                         .creator(currentUser)
                         .watchList(watchList)
                         .item(itemsById.get(itemId))

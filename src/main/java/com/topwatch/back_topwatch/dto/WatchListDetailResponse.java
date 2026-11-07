@@ -19,8 +19,6 @@ public record WatchListDetailResponse(
 
     public record WatchListItemEntry(
             Long id,
-            Boolean watched,
-            Instant watchedDate,
             String description,
             ItemResponse item
     ) {
@@ -28,8 +26,6 @@ public record WatchListDetailResponse(
         public static WatchListItemEntry from(WatchListItem watchListItem) {
             return new WatchListItemEntry(
                     watchListItem.getId(),
-                    watchListItem.getWatched(),
-                    watchListItem.getWatchedDate(),
                     watchListItem.getDescription(),
                     ItemResponse.from(watchListItem.getItem())
             );

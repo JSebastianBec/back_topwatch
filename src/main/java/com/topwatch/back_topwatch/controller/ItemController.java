@@ -63,23 +63,33 @@ public class ItemController {
 
     @Operation(
             summary = "Get all items",
+            description = "When excludeWatchListId is provided, items already in that watch list are left out",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping
-    public List<ItemResponse> getAllItems() {
-        return itemService.findAllItems().stream()
+    public List<ItemResponse> getAllItems(@RequestParam(required = false) Long excludeWatchListId) {
+        List<Item> items = excludeWatchListId == null
+                ? itemService.findAllItems()
+                : itemService.findItemsNotInWatchList(excludeWatchListId);
+        return items.stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Operation(
             summary = "Search items by name",
-            description = "Case-insensitive partial match on the item name",
+            description = "Case-insensitive partial match on the item name. When excludeWatchListId is provided, items already in that watch list are left out",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping("/search")
-    public List<ItemResponse> searchItemsByName(@RequestParam String name) {
-        return itemService.findItemsByName(name).stream()
+    public List<ItemResponse> searchItemsByName(
+            @RequestParam String name,
+            @RequestParam(required = false) Long excludeWatchListId
+    ) {
+        List<Item> items = excludeWatchListId == null
+                ? itemService.findItemsByName(name)
+                : itemService.findItemsByNameNotInWatchList(name, excludeWatchListId);
+        return items.stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
     }

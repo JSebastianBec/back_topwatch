@@ -492,7 +492,7 @@
       "uuid": "0c778408-67ad-4763-b730-1c5fbb63fb0f",
       "type": "http",
       "documentation": "Update current user",
-      "method": "patch",
+      "method": "post",
       "endpoint": "api/v1/users/me",
       "responses": [
         {
