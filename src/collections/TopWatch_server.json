@@ -493,7 +493,7 @@
       "type": "http",
       "documentation": "Update current user",
       "method": "post",
-      "endpoint": "api/v1/users/me",
+      "endpoint": "api/v1/users/me/update",
       "responses": [
         {
           "uuid": "c5a7a3fd-c22e-4509-9715-98793097b9f9",

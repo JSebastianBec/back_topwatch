@@ -534,7 +534,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/v1/users/me/update": {
       "post": {
         "tags": [
           "Users"
@@ -726,7 +728,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Delete current user",
+        "summary": "Delete user",
         "security": [
           {
             "bearerAuth": []
@@ -745,10 +747,14 @@
           "200": {
             "description": "OK"
           },
+          "403": {
+            "description": "Forbidden - caller is neither the target user nor an ADMIN"
+          },
           "404": {
             "description": "Not Found"
           }
-        }
+        },
+        "description": "Deletes the user with the given id. Allowed only for the user themselves or an ADMIN."
       }
     },
     "/api/v1/items": {

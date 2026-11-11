@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "b6b1a6e0-6b0a-4c7a-9b1a-topwatch00001",
     "name": "TopWatch API",
-    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete), items (create, list, get, search), categories (list, filter by type), watch lists (create, list, detail with associated items, add items) and watch list views (start viewing any list, list my views with progress, view detail, mark items watched). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId/watchListId/watchListViewId as collection variables so the rest of the requests work out of the box.",
+    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete), items (create, list, get, search), categories (list, filter by type), watch lists (create, list, list the ones from other users you can add, add them to your lists, detail with associated items, add items; list and detail responses include started/viewId for the logged-in user) and watch list views (start viewing any list, list my views with progress, view detail, mark items watched, recently watched items). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId/watchListId/watchListViewId as collection variables so the rest of the requests work out of the box.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -444,9 +444,9 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/users/me",
+              "raw": "{{base_url}}/api/v1/users/me/update",
               "host": [ "{{base_url}}" ],
-              "path": [ "api", "v1", "users", "me" ]
+              "path": [ "api", "v1", "users", "me", "update" ]
             },
             "description": "Partial update: any field can be omitted or left null/blank and it will be kept unchanged."
           },
@@ -464,9 +464,9 @@
                   "raw": "{\n    \"name\": \"Sebastian\",\n    \"lastname\": \"Becerra\",\n    \"nickname\": \"sebas\",\n    \"gender\": \"MALE\",\n    \"email\": \"sebas@topwatch.com\",\n    \"avatarURL\": \"https://cdn.topwatch.com/avatars/sebas.png\"\n}"
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v1/users/me",
+                  "raw": "{{base_url}}/api/v1/users/me/update",
                   "host": [ "{{base_url}}" ],
-                  "path": [ "api", "v1", "users", "me" ]
+                  "path": [ "api", "v1", "users", "me", "update" ]
                 }
               },
               "status": "OK",
@@ -488,9 +488,9 @@
                   "raw": "{\n    \"nickname\": \"already-taken\"\n}"
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v1/users/me",
+                  "raw": "{{base_url}}/api/v1/users/me/update",
                   "host": [ "{{base_url}}" ],
-                  "path": [ "api", "v1", "users", "me" ]
+                  "path": [ "api", "v1", "users", "me", "update" ]
                 }
               },
               "status": "Conflict",
@@ -595,7 +595,8 @@
               "raw": "{{base_url}}/api/v1/users/delete/{{user_id}}",
               "host": [ "{{base_url}}" ],
               "path": [ "api", "v1", "users", "delete", "{{user_id}}" ]
-            }
+            },
+            "description": "Deletes a user. Only the user themselves or an ADMIN may call this; anyone else gets 403 Forbidden."
           },
           "response": [
             {
@@ -628,6 +629,23 @@
               },
               "status": "Not Found",
               "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            },
+            {
+              "name": "403 Forbidden - Not self and not ADMIN",
+              "originalRequest": {
+                "method": "POST",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/users/delete/2",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "users", "delete", "2" ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
               "_postman_previewlanguage": "text",
               "header": [],
               "body": ""
@@ -1016,6 +1034,9 @@
                   "    const json = pm.response.json();",
                   "    if (Array.isArray(json) && json.length > 0) {",
                   "        pm.collectionVariables.set('watch_list_id', json[0].id);",
+                  "        if (json[0].viewId) {",
+                  "            pm.collectionVariables.set('watch_list_view_id', json[0].viewId);",
+                  "        }",
                   "    }",
                   "}"
                 ]
@@ -1032,7 +1053,7 @@
               "host": [ "{{base_url}}" ],
               "path": [ "api", "v1", "watch-lists" ]
             },
-            "description": "Returns every watch list with only id and name. Saves the first list's id into {{watch_list_id}} automatically."
+            "description": "Returns every watch list with id and name. Each list includes started (true when the authenticated user already started a view of it) and viewId (that view's id, or null when not started), so the front can show Start or Continue. Saves the first list's id into {{watch_list_id}} (and its viewId into {{watch_list_view_id}} when started) automatically."
           },
           "response": [
             {
@@ -1050,7 +1071,7 @@
               "code": 200,
               "_postman_previewlanguage": "json",
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
-              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Para el finde\"\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Clasicos de ciencia ficcion\"\n    }\n]"
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Para el finde\",\n        \"started\": true,\n        \"viewId\": 4\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Clasicos de ciencia ficcion\",\n        \"started\": false,\n        \"viewId\": null\n    }\n]"
             }
           ]
         },
@@ -1066,6 +1087,9 @@
                   "    const json = pm.response.json();",
                   "    if (Array.isArray(json) && json.length > 0) {",
                   "        pm.collectionVariables.set('watch_list_id', json[0].id);",
+                  "        if (json[0].viewId) {",
+                  "            pm.collectionVariables.set('watch_list_view_id', json[0].viewId);",
+                  "        }",
                   "    }",
                   "}"
                 ]
@@ -1082,7 +1106,7 @@
               "host": [ "{{base_url}}" ],
               "path": [ "api", "v1", "watch-lists", "me" ]
             },
-            "description": "Returns only the watch lists created by the authenticated user, with id and name. Saves the first list's id into {{watch_list_id}} automatically."
+            "description": "Returns the watch lists created by the authenticated user first, followed by the lists from other users they added with Add Watch Lists To Mine. Each list includes creator, owned (true only for lists you created; lists added from other users are read-only), started (true when the authenticated user already started a view of it) and viewId (that view's id, or null when not started). Saves the first list's id into {{watch_list_id}} (and its viewId into {{watch_list_view_id}} when started) automatically."
           },
           "response": [
             {
@@ -1100,7 +1124,144 @@
               "code": 200,
               "_postman_previewlanguage": "json",
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
-              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Para el finde\"\n    }\n]"
+              "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Para el finde\",\n        \"creator\": {\n            \"id\": 1,\n            \"nickname\": \"sebas\"\n        },\n        \"owned\": true,\n        \"started\": true,\n        \"viewId\": 4\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Clasicos de ciencia ficcion\",\n        \"creator\": {\n            \"id\": 2,\n            \"nickname\": \"ana\"\n        },\n        \"owned\": false,\n        \"started\": false,\n        \"viewId\": null\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Watch Lists To Add",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (Array.isArray(json) && json.length > 0) {",
+                  "        pm.collectionVariables.set('watch_list_id', json[0].id);",
+                  "        if (json[0].viewId) {",
+                  "            pm.collectionVariables.set('watch_list_view_id', json[0].viewId);",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists/not-started",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "v1", "watch-lists", "not-started" ]
+            },
+            "description": "Returns the watch lists from other users that the authenticated user can still add to their lists: not created by them, not already added and not started yet. Use it to pick lists for Add Watch Lists To Mine. started is always false and viewId is null here. Saves the first list's id into {{watch_list_id}} automatically."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/not-started",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "not-started" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "[\n    {\n        \"id\": 2,\n        \"name\": \"Clasicos de ciencia ficcion\",\n        \"creator\": {\n            \"id\": 2,\n            \"nickname\": \"ana\"\n        },\n        \"owned\": false,\n        \"started\": false,\n        \"viewId\": null\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Add Watch Lists To Mine",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"watchListIds\": [{{watch_list_id}}]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists/me/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "watch-lists",
+                "me",
+                "add"
+              ]
+            },
+            "description": "Adds one or more watch lists created by other users to the authenticated user's lists, so they show up in Get My Watch Lists. They stay read-only: only their creator can add items. Adding a list does not start it; use Start Watch List View for that. All lists are added or none are. Possible errors: 400 (empty list, null id, same id twice, or one of your own lists), 404 (any watch list not found), 409 (any list already added)."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"watchListIds\": [2, 3]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/me/add",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-lists",
+                    "me",
+                    "add"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n    {\n        \"id\": 2,\n        \"name\": \"Clasicos de ciencia ficcion\",\n        \"creator\": {\n            \"id\": 2,\n            \"nickname\": \"ana\"\n        },\n        \"owned\": false,\n        \"started\": false,\n        \"viewId\": null\n    },\n    {\n        \"id\": 3,\n        \"name\": \"Anime de los 90\",\n        \"creator\": {\n            \"id\": 3,\n            \"nickname\": \"juli\"\n        },\n        \"owned\": false,\n        \"started\": false,\n        \"viewId\": null\n    }\n]"
             }
           ]
         },
@@ -1136,7 +1297,7 @@
               "host": [ "{{base_url}}" ],
               "path": [ "api", "v1", "watch-lists", "save" ]
             },
-            "description": "Creates a watch list owned by the authenticated user. Saves the new id into {{watch_list_id}} automatically."
+            "description": "Creates a watch list owned by the authenticated user. A new list is not started yet, so started is false and viewId is null. Saves the new id into {{watch_list_id}} automatically."
           },
           "response": [
             {
@@ -1161,7 +1322,7 @@
               "code": 201,
               "_postman_previewlanguage": "json",
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
-              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\"\n}"
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\",\n    \"started\": false,\n    \"viewId\": null\n}"
             },
             {
               "name": "400 Bad Request - Missing name",
@@ -1191,6 +1352,25 @@
         },
         {
           "name": "Get Watch List Detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.viewId) {",
+                  "        pm.collectionVariables.set('watch_list_view_id', json.viewId);",
+                  "    }",
+                  "    if (Array.isArray(json.items) && json.items.length > 0) {",
+                  "        pm.collectionVariables.set('watch_list_item_id', json.items[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -1201,11 +1381,11 @@
               "host": [ "{{base_url}}" ],
               "path": [ "api", "v1", "watch-lists", "{{watch_list_id}}" ]
             },
-            "description": "Returns the watch list plus the items associated with it (each with its description and the full item). Watched state is per user and lives in Watch List Views."
+            "description": "Returns the watch list plus the items associated with it (each with its description and the full item). started / viewId tell whether the authenticated user already started a view of this list (viewId is null when not). Watched state is per user and lives in Watch List Views. Saves viewId into {{watch_list_view_id}} when started, and the first entry's id into {{watch_list_item_id}}, automatically."
           },
           "response": [
             {
-              "name": "200 OK",
+              "name": "200 OK - Not started",
               "originalRequest": {
                 "method": "GET",
                 "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
@@ -1219,7 +1399,24 @@
               "code": 200,
               "_postman_previewlanguage": "json",
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
-              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\",\n    \"creationDate\": \"2026-09-01T10:00:00Z\",\n    \"description\": null,\n    \"creator\": {\n        \"id\": 1,\n        \"nickname\": \"sebas\"\n    },\n    \"items\": [\n        {\n            \"id\": 5,\n            \"description\": null,\n            \"item\": {\n                \"id\": 1,\n                \"name\": \"Dune\",\n                \"creationDate\": \"2026-08-27T15:04:00Z\",\n                \"description\": \"Sci-fi novel by Frank Herbert\",\n                \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n                \"type\": \"BOOKS\",\n                \"creator\": {\n                    \"id\": 1,\n                    \"nickname\": \"sebas\"\n                },\n                \"categories\": [\n                    {\n                        \"id\": 1,\n                        \"name\": \"Sci-Fi\",\n                        \"description\": \"Science fiction\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\",\n    \"creationDate\": \"2026-09-01T10:00:00Z\",\n    \"description\": null,\n    \"creator\": {\n        \"id\": 1,\n        \"nickname\": \"sebas\"\n    },\n    \"started\": false,\n    \"viewId\": null,\n    \"items\": [\n        {\n            \"id\": 5,\n            \"description\": null,\n            \"item\": {\n                \"id\": 1,\n                \"name\": \"Dune\",\n                \"creationDate\": \"2026-08-27T15:04:00Z\",\n                \"description\": \"Sci-fi novel by Frank Herbert\",\n                \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n                \"type\": \"BOOKS\",\n                \"creator\": {\n                    \"id\": 1,\n                    \"nickname\": \"sebas\"\n                },\n                \"categories\": [\n                    {\n                        \"id\": 1,\n                        \"name\": \"Sci-Fi\",\n                        \"description\": \"Science fiction\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+            },
+            {
+              "name": "200 OK - Started",
+              "originalRequest": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1",
+                  "host": [ "{{base_url}}" ],
+                  "path": [ "api", "v1", "watch-lists", "1" ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [ { "key": "Content-Type", "value": "application/json" } ],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Para el finde\",\n    \"creationDate\": \"2026-09-01T10:00:00Z\",\n    \"description\": null,\n    \"creator\": {\n        \"id\": 1,\n        \"nickname\": \"sebas\"\n    },\n    \"started\": true,\n    \"viewId\": 4,\n    \"items\": [\n        {\n            \"id\": 5,\n            \"description\": null,\n            \"item\": {\n                \"id\": 1,\n                \"name\": \"Dune\",\n                \"creationDate\": \"2026-08-27T15:04:00Z\",\n                \"description\": \"Sci-fi novel by Frank Herbert\",\n                \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n                \"type\": \"BOOKS\",\n                \"creator\": {\n                    \"id\": 1,\n                    \"nickname\": \"sebas\"\n                },\n                \"categories\": [\n                    {\n                        \"id\": 1,\n                        \"name\": \"Sci-Fi\",\n                        \"description\": \"Science fiction\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
             },
             {
               "name": "404 Not Found",
@@ -1706,9 +1903,17 @@
                 "v1",
                 "watch-list-views",
                 "recently-watched"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Optional. How many items to return, 1 to 100 (default 20)",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Returns the items the authenticated user marked as watched across all their watch list views, most recently watched first, each with the watch list it belongs to (watchList.name). Optional query param limit (default 20, max 100). Meant for the home page."
+            "description": "Returns the items the authenticated user marked as watched across all their watch list views, most recently watched first, each with the watch list it belongs to (watchList.name). Optional query param limit, 1 to 100 (default 20): enable it in Params. A value outside that range returns 400. Meant for the home page."
           },
           "response": [
             {
@@ -1744,6 +1949,46 @@
                 }
               ],
               "body": "[\n    {\n        \"watchListViewId\": 2,\n        \"watchListItemId\": 7,\n        \"watchedDate\": \"2026-11-05T21:40:00Z\",\n        \"item\": {\n            \"id\": 3,\n            \"name\": \"Dune: Part Two\",\n            \"urlAvatar\": \"https://cdn.example.com/dune2.jpg\"\n        },\n        \"watchList\": {\n            \"id\": 3,\n            \"name\": \"Clasicos\"\n        }\n    },\n    {\n        \"watchListViewId\": 1,\n        \"watchListItemId\": 2,\n        \"watchedDate\": \"2026-10-20T18:05:00Z\",\n        \"item\": {\n            \"id\": 5,\n            \"name\": \"Alien\",\n            \"urlAvatar\": null\n        },\n        \"watchList\": {\n            \"id\": 1,\n            \"name\": \"Para el finde\"\n        }\n    }\n]"
+            },
+            {
+              "name": "400 Bad Request - Invalid limit",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-list-views/recently-watched?limit=500",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-list-views",
+                    "recently-watched"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "500"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n    \"message\": \"Limit must be between 1 and 100\"\n}"
             }
           ]
         },

@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,16 @@ public class WatchListViewService {
 
     public List<WatchListView> findViewsByViewer(@NonNull User viewer) {
         return watchListViewRepository.findByViewer_IdOrderByStartDateDesc(viewer.getId());
+    }
+
+    /** Watch list id -> id of the viewer's view on it, for every watch list the viewer has started. */
+    public Map<Long, Long> findViewIdsByWatchListId(@NonNull User viewer) {
+        return watchListViewRepository.findByViewer_IdOrderByStartDateDesc(viewer.getId()).stream()
+                .collect(Collectors.toMap(view -> view.getWatchList().getId(), WatchListView::getId));
+    }
+
+    public Optional<WatchListView> findViewByViewerAndWatchList(@NonNull User viewer, @NonNull Long watchListId) {
+        return watchListViewRepository.findByViewer_IdAndWatchList_Id(viewer.getId(), watchListId);
     }
 
     public static final int DEFAULT_RECENTLY_WATCHED_LIMIT = 20;

@@ -25,6 +25,7 @@ import org.springframework.security.access.AccessDeniedException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -189,6 +190,23 @@ class WatchListViewServiceTest {
                 .isInstanceOf(BadRequestException.class);
         assertThatThrownBy(() -> watchListViewService.findRecentlyWatchedItems(viewer, 101))
                 .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void findViewIdsByWatchListId_mapsStartedListsToViewIds() {
+        WatchList other = WatchList.builder().id(11L).name("Otra").creator(owner).build();
+        WatchListView otherView = WatchListView.builder().id(101L).viewer(viewer).watchList(other).build();
+        when(watchListViewRepository.findByViewer_IdOrderByStartDateDesc(2L)).thenReturn(List.of(view, otherView));
+
+        assertThat(watchListViewService.findViewIdsByWatchListId(viewer))
+                .isEqualTo(Map.of(10L, 100L, 11L, 101L));
+    }
+
+    @Test
+    void findViewIdsByWatchListId_isEmptyWhenNothingStarted() {
+        when(watchListViewRepository.findByViewer_IdOrderByStartDateDesc(1L)).thenReturn(List.of());
+
+        assertThat(watchListViewService.findViewIdsByWatchListId(owner)).isEmpty();
     }
 
 }
