@@ -21,13 +21,19 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public User update(@NonNull User currentUser, UpdateUserRequest request) {
         if (StringUtils.hasText(request.name()))      currentUser.setName(request.name());
         if (StringUtils.hasText(request.lastname()))  currentUser.setLastname(request.lastname());
         if (request.gender() != null)                 currentUser.setGender(request.gender());
-        if (StringUtils.hasText(request.avatarURL())) currentUser.setAvatarURL(request.avatarURL());
+        if (StringUtils.hasText(request.avatarURL()) && !request.avatarURL().equals(currentUser.getAvatarURL())) {
+            imageStorageService.validateImageUrl(request.avatarURL(), currentUser.getId());
+            String oldUrl = currentUser.getAvatarURL();
+            currentUser.setAvatarURL(request.avatarURL());
+            imageStorageService.deleteIfOwned(oldUrl, currentUser.getId()); // removes the old S3 file
+        }
 
         if (StringUtils.hasText(request.nickname()) && !request.nickname().equals(currentUser.getNickname())) {
             if (userRepository.existsByNicknameAndIdNot(request.nickname(), currentUser.getId())) {

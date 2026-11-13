@@ -1,5 +1,6 @@
 package com.topwatch.back_topwatch.exception;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -21,6 +24,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleDuplicateResource(DuplicateResourceException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", ex.getMessage()));
+    }
+
+    // Malformed or badly signed token sent to /auth/refresh or /auth/logout
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<Map<String, String>> handleJwt(JwtException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Invalid token"));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -84,6 +94,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", "A unique or required field constraint was violated"));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> handleTooLarge(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(Map.of("message", "Image must be 5MB or less"));
+    }
+
+    @ExceptionHandler(S3Exception.class)
+    public ResponseEntity<Map<String, String>> handleS3(S3Exception ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("message", "Image storage is unavailable, try again"));
     }
 
 }

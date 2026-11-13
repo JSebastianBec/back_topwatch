@@ -4,6 +4,7 @@ import com.topwatch.back_topwatch.domain.Item;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.dto.CreateItemRequest;
 import com.topwatch.back_topwatch.dto.ItemResponse;
+import com.topwatch.back_topwatch.service.ImageStorageService;
 import com.topwatch.back_topwatch.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class ItemController {
 
     private final ItemService itemService;
+    private final ImageStorageService imageStorageService;
 
     @Operation(
             summary = "Create item",
@@ -37,6 +39,7 @@ public class ItemController {
             @Valid @RequestBody CreateItemRequest request,
             @AuthenticationPrincipal User currentUser
     ) {
+        imageStorageService.validateImageUrl(request.urlAvatar(), currentUser.getId());
         Item item = Item.builder()
                 .name(request.name())
                 .description(request.description())

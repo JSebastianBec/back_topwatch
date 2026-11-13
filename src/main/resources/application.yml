@@ -4,15 +4,23 @@ server:
 application:
   security:
     jwt:
-      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      secret-key: ${JWT_SECRET}         # required, Base64 HMAC key (see .env.example)
       expiration: 900000        # 15 minutes in ms (access token)
       refresh-expiration: 604800000  # 7 days in ms (refresh token)
+  storage:
+    s3:
+      bucket: ${S3_BUCKET:topwatch-images}
+      region: ${AWS_REGION:us-east-2}
+      public-base-url: ${S3_PUBLIC_URL:https://topwatch-images.s3.us-east-2.amazonaws.com}
 
 spring:
+  # Local secrets live in an untracked .env file next to build.gradle; real environment variables win
+  config:
+    import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5432/topwatch_db
-    username: postgres
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/topwatch_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -20,3 +28,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: false
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
