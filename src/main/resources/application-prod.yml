@@ -1,0 +1,16 @@
+# Production profile. Activate with SPRING_PROFILES_ACTIVE=prod.
+# Every value comes from the environment; there are no defaults, so a missing
+# variable fails startup instead of silently falling back to local values.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET}

@@ -1,10 +1,11 @@
+# Shared settings for every profile.
+# Profile-specific values live in application-dev.yml and application-prod.yml.
 server:
   port: 8080
 
 application:
   security:
     jwt:
-      secret-key: ${JWT_SECRET}         # required, Base64 HMAC key (see .env.example)
       expiration: 900000        # 15 minutes in ms (access token)
       refresh-expiration: 604800000  # 7 days in ms (refresh token)
   storage:
@@ -14,16 +15,10 @@ application:
       public-base-url: ${S3_PUBLIC_URL:https://topwatch-images.s3.us-east-2.amazonaws.com}
 
 spring:
-  # Local secrets live in an untracked .env file next to build.gradle; real environment variables win
-  config:
-    import: optional:file:.env[.properties]
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/topwatch_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD}
+  profiles:
+    # Used only when SPRING_PROFILES_ACTIVE is not set
+    default: dev
   jpa:
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
