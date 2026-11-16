@@ -96,6 +96,18 @@ public class WatchListViewController {
         return toDetailResponse(watchListViewService.setWatched(id, watchListItemId, request.watched(), currentUser));
     }
 
+    @Operation(
+            summary = "Stop viewing a watch list",
+            description = "Removes your view and all the watched state stored in it. The watch list itself is not modified "
+                    + "and you can start viewing it again later. To unmark a single item use POST /{id}/items/{watchListItemId} with watched = false",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteView(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+        watchListViewService.deleteView(id, currentUser);
+        return ResponseEntity.noContent().build();
+    }
+
     private WatchListViewResponse toResponse(WatchListView view) {
         return WatchListViewResponse.from(
                 view,

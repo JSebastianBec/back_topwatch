@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "b6b1a6e0-6b0a-4c7a-9b1a-topwatch00001",
     "name": "TopWatch API",
-    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete), items (create, list, get, search), categories (list, filter by type), watch lists (create, list, list the ones from other users you can add, add them to your lists, detail with associated items, add items; list and detail responses include started/viewId for the logged-in user) and watch list views (start viewing any list, list my views with progress, view detail, mark items watched, recently watched items). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId/watchListId/watchListViewId as collection variables so the rest of the requests work out of the box.",
+    "description": "Collection covering the current back_topwatch endpoints: authentication (register, login, refresh, logout), user management (profile, list, get, delete), items (create, list, get, search), categories (list, filter by type), watch lists (create, list, list the ones from other users you can add, add them to your lists, detail with associated items, add items; list and detail responses include started/viewId for the logged-in user) and watch list views (start viewing any list, list my views with progress, view detail, mark items watched, recently watched items, stop viewing) and deletes (items, watch lists and watch list views, creator or owner only). Test scripts on the auth/create requests automatically save accessToken/refreshToken/userId/itemId/watchListId/watchListViewId as collection variables so the rest of the requests work out of the box.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -923,6 +923,169 @@
               "body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Dune\",\n        \"creationDate\": \"2026-08-27T15:04:00Z\",\n        \"description\": \"Sci-fi novel by Frank Herbert\",\n        \"urlAvatar\": \"https://cdn.topwatch.com/items/dune.png\",\n        \"type\": \"BOOKS\",\n        \"creator\": {\n            \"id\": 1,\n            \"nickname\": \"sebas\"\n        },\n        \"categories\": [\n            {\n                \"id\": 1,\n                \"name\": \"Sci-Fi\",\n                \"description\": \"Science fiction\"\n            }\n        ]\n    }\n]"
             }
           ]
+        },
+        {
+          "name": "Delete Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/{{item_id}}/delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "items",
+                "{{item_id}}",
+                "delete"
+              ]
+            },
+            "description": "Deletes item {{item_id}}. Only its creator can delete it. It is also removed from the creator's own watch lists, along with every viewer's watched state for it. If a watch list created by another user contains the item, nothing is deleted and 409 is returned with the ids of those watch lists. An image uploaded by the creator is deleted from storage too. Possible errors: 403 (not the creator), 404 (item not found), 409 (used in other users' watch lists)."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/1/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "items",
+                    "1",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "_postman_previewlanguage": "text",
+              "body": ""
+            },
+            {
+              "name": "403 Forbidden - Not the creator",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/2/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "items",
+                    "2",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Only the item creator can delete it\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/999/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "items",
+                    "999",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Item not found\"\n}"
+            },
+            {
+              "name": "409 Conflict - Used in other users' lists",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/items/1/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "items",
+                    "1",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Item is used in watch lists created by other users: [3, 5]\"\n}"
+            }
+          ]
         }
       ]
     },
@@ -1598,6 +1761,134 @@
               "_postman_previewlanguage": "json",
               "header": [ { "key": "Content-Type", "value": "application/json" } ],
               "body": "{\n    \"message\": \"Items already in this watch list: [1]\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Watch List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-lists/{{watch_list_id}}/delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "watch-lists",
+                "{{watch_list_id}}",
+                "delete"
+              ]
+            },
+            "description": "Deletes watch list {{watch_list_id}}. Only its creator can delete it. Its entries, every user's view of it (with their watched state) and every user's link to it in their lists (Add Watch Lists To Mine) are deleted too. The items themselves are kept. Possible errors: 403 (not the creator), 404 (watch list not found)."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/1/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-lists",
+                    "1",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "_postman_previewlanguage": "text",
+              "body": ""
+            },
+            {
+              "name": "403 Forbidden - Not the creator",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/2/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-lists",
+                    "2",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Only the watch list creator can delete it\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-lists/999/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-lists",
+                    "999",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Watch list not found\"\n}"
             }
           ]
         }
@@ -2380,6 +2671,134 @@
                 }
               ],
               "body": "{\n    \"message\": \"Item is not in this watch list\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Stop Watch List View",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/watch-list-views/{{watch_list_view_id}}/delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "watch-list-views",
+                "{{watch_list_view_id}}",
+                "delete"
+              ]
+            },
+            "description": "Stops viewing: deletes your view {{watch_list_view_id}} and all the watched state stored in it. The watch list is not modified, and you can start viewing it again later with Start Watch List View. To unmark a single item instead, use Mark Item Watched with watched = false. Possible errors: 403 (not your view), 404 (view not found)."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-list-views/1/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-list-views",
+                    "1",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "_postman_previewlanguage": "text",
+              "body": ""
+            },
+            {
+              "name": "403 Forbidden - Not your view",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-list-views/2/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-list-views",
+                    "2",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Only the user who started this view can access it\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/watch-list-views/999/delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "watch-list-views",
+                    "999",
+                    "delete"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "_postman_previewlanguage": "json",
+              "body": "{\n    \"message\": \"Watch list view not found\"\n}"
             }
           ]
         }

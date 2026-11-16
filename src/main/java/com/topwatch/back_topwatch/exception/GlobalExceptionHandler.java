@@ -26,6 +26,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", ex.getMessage()));
     }
 
+    @ExceptionHandler(ResourceInUseException.class)
+    public ResponseEntity<Map<String, String>> handleResourceInUse(ResourceInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
     // Malformed or badly signed token sent to /auth/refresh or /auth/logout
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<Map<String, String>> handleJwt(JwtException ex) {

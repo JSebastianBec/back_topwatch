@@ -12,6 +12,8 @@ import com.topwatch.back_topwatch.repository.ItemRepository;
 import com.topwatch.back_topwatch.repository.SavedWatchListRepository;
 import com.topwatch.back_topwatch.repository.WatchListItemRepository;
 import com.topwatch.back_topwatch.repository.WatchListRepository;
+import com.topwatch.back_topwatch.repository.WatchListViewItemRepository;
+import com.topwatch.back_topwatch.repository.WatchListViewRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,6 +38,8 @@ public class WatchListService {
     private final WatchListItemRepository watchListItemRepository;
     private final ItemRepository itemRepository;
     private final SavedWatchListRepository savedWatchListRepository;
+    private final WatchListViewRepository watchListViewRepository;
+    private final WatchListViewItemRepository watchListViewItemRepository;
 
     public List<WatchList> findAllWatchLists() {
         return watchListRepository.findAll();
@@ -166,6 +170,27 @@ public class WatchListService {
                 .toList();
 
         return watchListItemRepository.saveAll(watchListItems);
+    }
+
+    /**
+     * Deletes a watch list. Only its creator can do it. Everything that depends on the list goes with it:
+     * its entries, every user's view of it (with their watched state) and every "added to my lists" link.
+     * The items themselves are kept.
+     */
+    @Transactional
+    public void deleteWatchList(@NonNull Long watchListId, @NonNull User currentUser) {
+        WatchList watchList = watchListRepository.findById(watchListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Watch list not found"));
+        if (!watchList.getCreator().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Only the watch list creator can delete it");
+        }
+
+        // Children first so no foreign key points to a removed row
+        watchListViewItemRepository.deleteByWatchListId(watchListId);
+        watchListViewRepository.deleteByWatchListId(watchListId);
+        savedWatchListRepository.deleteByWatchListId(watchListId);
+        watchListItemRepository.deleteByWatchListId(watchListId);
+        watchListRepository.delete(watchList);
     }
 
 }

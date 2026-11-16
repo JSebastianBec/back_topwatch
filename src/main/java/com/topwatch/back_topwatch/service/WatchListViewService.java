@@ -136,4 +136,15 @@ public class WatchListViewService {
         return view;
     }
 
+    /**
+     * Stops viewing a watch list: removes the viewer's view and every watched state stored in it.
+     * The watch list and its items are left untouched, and the list can be started again later.
+     */
+    @Transactional
+    public void deleteView(@NonNull Long viewId, @NonNull User viewer) {
+        WatchListView view = findOwnView(viewId, viewer);
+        watchListViewItemRepository.deleteByViewId(view.getId());
+        watchListViewRepository.delete(view);
+    }
+
 }
