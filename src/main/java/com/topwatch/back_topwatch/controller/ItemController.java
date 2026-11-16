@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/items")
 @RequiredArgsConstructor
@@ -95,6 +97,24 @@ public class ItemController {
         return items.stream()
                 .map(ItemResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Operation(
+            summary = "Delete item",
+            description = "Deletes an item created by the authenticated user and removes it from their own watch lists. "
+                    + "Fails with 409 when a watch list created by another user contains it. Only the creator can delete it",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+        Item item = itemService.deleteItem(id, currentUser);
+        // The item is already gone, so a storage failure must not turn this into an error
+        try {
+            imageStorageService.deleteIfOwned(item.getUrlAvatar(), currentUser.getId());
+        } catch (RuntimeException e) {
+            log.warn("Could not delete image of item {}: {}", id, e.getMessage());
+        }
+        return ResponseEntity.noContent().build();
     }
 
 }

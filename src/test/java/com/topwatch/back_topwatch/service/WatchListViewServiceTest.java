@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -207,6 +209,37 @@ class WatchListViewServiceTest {
         when(watchListViewRepository.findByViewer_IdOrderByStartDateDesc(1L)).thenReturn(List.of());
 
         assertThat(watchListViewService.findViewIdsByWatchListId(owner)).isEmpty();
+    }
+
+
+    @Test
+    void deleteView_removesWatchedStateThenView() {
+        when(watchListViewRepository.findById(100L)).thenReturn(Optional.of(view));
+
+        watchListViewService.deleteView(100L, viewer);
+
+        InOrder order = inOrder(watchListViewItemRepository, watchListViewRepository);
+        order.verify(watchListViewItemRepository).deleteByViewId(100L);
+        order.verify(watchListViewRepository).delete(view);
+        verify(watchListRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteView_rejectsOtherUsers() {
+        when(watchListViewRepository.findById(100L)).thenReturn(Optional.of(view));
+
+        assertThatThrownBy(() -> watchListViewService.deleteView(100L, owner))
+                .isInstanceOf(AccessDeniedException.class);
+        verify(watchListViewRepository, never()).delete(any());
+        verify(watchListViewItemRepository, never()).deleteByViewId(any());
+    }
+
+    @Test
+    void deleteView_throwsWhenViewMissing() {
+        when(watchListViewRepository.findById(100L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> watchListViewService.deleteView(100L, viewer))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
 }

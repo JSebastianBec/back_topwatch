@@ -144,4 +144,16 @@ public class WatchListController {
                         .toList());
     }
 
+    @Operation(
+            summary = "Delete watch list",
+            description = "Deletes a watch list created by the authenticated user, together with its entries, every user's view of it "
+                    + "and every user's link to it in their lists. The items are kept. Only the creator can delete it",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteWatchList(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+        watchListService.deleteWatchList(id, currentUser);
+        return ResponseEntity.noContent().build();
+    }
+
 }
