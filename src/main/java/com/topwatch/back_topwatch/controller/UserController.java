@@ -1,6 +1,7 @@
 package com.topwatch.back_topwatch.controller;
 
 import com.topwatch.back_topwatch.domain.User;
+import com.topwatch.back_topwatch.domain.enums.Role;
 import com.topwatch.back_topwatch.dto.UpdateUserRequest;
 import com.topwatch.back_topwatch.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +51,7 @@ public class UserController {
             description = "Updates the authenticated user's profile with the provided fields",
             security = @SecurityRequirement(name = "Bearer Token")
     )
-    @PatchMapping("/me")
+    @PostMapping("/me/update")
     public ResponseEntity<User> update(
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal User currentUser
@@ -58,14 +60,20 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Delete current user",
-            description = "Delete the authenticated user's profile with the provided fields",
+            summary = "Delete user",
+            description = "Deletes the user with the given id. Allowed only for the user themselves or an ADMIN; anyone else gets 403.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping("/delete/{id}")
     public ResponseEntity<String> delete(
-            @PathVariable("id") Long id
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal User currentUser
     ) {
+        boolean isSelf = id.equals(currentUser.getId());
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+        if (!isSelf && !isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Optional<User> user = userService.findUserById(id);
         if (user.isPresent()){
             userService.delete(user.get());

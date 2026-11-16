@@ -1,6 +1,7 @@
 package com.topwatch.back_topwatch.service;
 
 import com.topwatch.back_topwatch.domain.Item;
+import com.topwatch.back_topwatch.domain.SavedWatchList;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.domain.WatchList;
 import com.topwatch.back_topwatch.domain.WatchListItem;
@@ -8,6 +9,7 @@ import com.topwatch.back_topwatch.exception.BadRequestException;
 import com.topwatch.back_topwatch.exception.DuplicateResourceException;
 import com.topwatch.back_topwatch.exception.ResourceNotFoundException;
 import com.topwatch.back_topwatch.repository.ItemRepository;
+import com.topwatch.back_topwatch.repository.SavedWatchListRepository;
 import com.topwatch.back_topwatch.repository.WatchListItemRepository;
 import com.topwatch.back_topwatch.repository.WatchListRepository;
 import lombok.NonNull;
@@ -17,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,71 @@ public class WatchListService {
     private final WatchListRepository watchListRepository;
     private final WatchListItemRepository watchListItemRepository;
     private final ItemRepository itemRepository;
+    private final SavedWatchListRepository savedWatchListRepository;
 
     public List<WatchList> findAllWatchLists() {
         return watchListRepository.findAll();
+    }
+
+    public List<WatchList> findWatchListsByCreator(@NonNull User creator) {
+        return watchListRepository.findByCreator_Id(creator.getId());
+    }
+
+    /** The user's own watch lists plus the ones from other users they added. */
+    public List<WatchList> findMyWatchLists(@NonNull User user) {
+        return watchListRepository.findMineIncludingSaved(user.getId());
+    }
+
+    /**
+     * Adds watch lists created by other users to the user's own lists. All are added or none:
+     * fails on unknown ids, on the user's own lists and on lists already added.
+     */
+    @Transactional
+    public List<WatchList> addToMyWatchLists(@NonNull List<Long> watchListIds, @NonNull User user) {
+        if (watchListIds.isEmpty()) {
+            throw new BadRequestException("At least one watch list id is required");
+        }
+        if (watchListIds.stream().anyMatch(Objects::isNull)) {
+            throw new BadRequestException("Watch list id is required");
+        }
+        Set<Long> uniqueIds = new LinkedHashSet<>(watchListIds);
+        if (uniqueIds.size() != watchListIds.size()) {
+            throw new BadRequestException("Each watch list can only appear once per request");
+        }
+
+        Map<Long, WatchList> watchListsById = watchListRepository.findAllById(uniqueIds).stream()
+                .collect(Collectors.toMap(WatchList::getId, Function.identity()));
+        List<Long> missingIds = uniqueIds.stream()
+                .filter(id -> !watchListsById.containsKey(id))
+                .toList();
+        if (!missingIds.isEmpty()) {
+            throw new ResourceNotFoundException("Watch lists not found: " + missingIds);
+        }
+
+        List<Long> ownIds = uniqueIds.stream()
+                .filter(id -> watchListsById.get(id).getCreator().getId().equals(user.getId()))
+                .toList();
+        if (!ownIds.isEmpty()) {
+            throw new BadRequestException("These watch lists are already yours: " + ownIds);
+        }
+
+        List<Long> alreadyAddedIds = savedWatchListRepository.findByUser_IdAndWatchList_IdIn(user.getId(), uniqueIds).stream()
+                .map(saved -> saved.getWatchList().getId())
+                .toList();
+        if (!alreadyAddedIds.isEmpty()) {
+            throw new DuplicateResourceException("Watch lists already in your lists: " + alreadyAddedIds);
+        }
+
+        List<WatchList> watchLists = uniqueIds.stream().map(watchListsById::get).toList();
+        savedWatchListRepository.saveAll(watchLists.stream()
+                .map(watchList -> SavedWatchList.builder().user(user).watchList(watchList).build())
+                .toList());
+        return watchLists;
+    }
+
+    /** Lists from other users that the user has not added nor started yet. */
+    public List<WatchList> findWatchListsNotStartedBy(@NonNull User viewer) {
+        return watchListRepository.findNotStartedByViewer(viewer.getId());
     }
 
     public Optional<WatchList> findWatchListById(@NonNull Long id) {
@@ -93,12 +156,9 @@ public class WatchListService {
             throw new DuplicateResourceException("Items already in this watch list: " + alreadyLinkedItemIds);
         }
 
-        // New entries start unwatched, dated at the moment they are added and without a description
-        Instant addedAt = Instant.now();
+        // New entries start without a description; watched state lives in each user's WatchListView
         List<WatchListItem> watchListItems = itemIds.stream()
                 .map(itemId -> WatchListItem.builder()
-                        .watched(false)
-                        .watchedDate(addedAt)
                         .creator(currentUser)
                         .watchList(watchList)
                         .item(itemsById.get(itemId))

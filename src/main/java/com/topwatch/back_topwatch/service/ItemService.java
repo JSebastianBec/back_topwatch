@@ -30,6 +30,14 @@ public class ItemService {
         return itemRepository.findByNameContainingIgnoreCase(name);
     }
 
+    public List<Item> findItemsNotInWatchList(@NonNull Long watchListId) {
+        return itemRepository.findAllNotInWatchList(watchListId);
+    }
+
+    public List<Item> findItemsByNameNotInWatchList(@NonNull String name, @NonNull Long watchListId) {
+        return itemRepository.findByNameNotInWatchList(name, watchListId);
+    }
+
     public Set<Category> resolveCategories(Set<Long> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) {
             return new HashSet<>();

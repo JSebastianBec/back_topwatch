@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,7 +60,7 @@ class UserControllerTest {
 
     @Test
     void update_returnsUpdatedUser() {
-        UpdateUserRequest request = new UpdateUserRequest("New Name", null, null, null, null, null, null);
+        UpdateUserRequest request = new UpdateUserRequest("New Name", null, null, null, null, null);
         when(userService.update(user, request)).thenReturn(user);
 
         ResponseEntity<User> response = userController.update(request, user);
@@ -67,19 +70,41 @@ class UserControllerTest {
     }
 
     @Test
-    void delete_returnsOk_whenUserExists() {
+    void delete_returnsOk_whenUserDeletesThemselves() {
         when(userService.findUserById(1L)).thenReturn(Optional.of(user));
 
-        ResponseEntity<String> response = userController.delete(1L);
+        ResponseEntity<String> response = userController.delete(1L, user);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(userService).delete(user);
     }
 
     @Test
-    void delete_returnsNotFound_whenUserDoesNotExist() {
+    void delete_returnsForbidden_whenUserDeletesSomeoneElse() {
+        ResponseEntity<String> response = userController.delete(2L, user);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        verify(userService, never()).findUserById(any());
+        verify(userService, never()).delete(any());
+    }
+
+    @Test
+    void delete_returnsOk_whenAdminDeletesAnotherUser() {
+        User admin = User.builder().id(10L).email("admin@topwatch.com").role(Role.ADMIN).build();
+        when(userService.findUserById(1L)).thenReturn(Optional.of(user));
+
+        ResponseEntity<String> response = userController.delete(1L, admin);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(userService).delete(user);
+    }
+
+    @Test
+    void delete_returnsNotFound_whenAdminDeletesMissingUser() {
+        User admin = User.builder().id(10L).email("admin@topwatch.com").role(Role.ADMIN).build();
         when(userService.findUserById(99L)).thenReturn(Optional.empty());
 
-        ResponseEntity<String> response = userController.delete(99L);
+        ResponseEntity<String> response = userController.delete(99L, admin);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }

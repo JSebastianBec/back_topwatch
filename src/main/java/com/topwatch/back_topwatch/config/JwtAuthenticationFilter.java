@@ -2,6 +2,7 @@ package com.topwatch.back_topwatch.config;
 
 import com.topwatch.back_topwatch.service.JwtService;
 import com.topwatch.back_topwatch.service.TokenBlacklistService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -41,16 +43,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-
-        if (tokenBlacklistService.isRevoked(jwtService.extractJti(jwt))) {
+        final String jti;
+        final String userEmail;
+        try {
+            jti = jwtService.extractJti(jwt);
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (JwtException | IllegalArgumentException e) {
+            // Malformed or badly signed token: continue unauthenticated so protected routes answer 401
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String userEmail = jwtService.extractUsername(jwt);
+        if (tokenBlacklistService.isRevoked(jti)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+            final UserDetails userDetails;
+            try {
+                userDetails = userDetailsService.loadUserByUsername(userEmail);
+            } catch (UsernameNotFoundException e) {
+                // Token of a user that no longer exists
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

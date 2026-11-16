@@ -93,7 +93,7 @@ class RequestValidationTest {
 
     @Test
     void updateUserRequest_isValid_whenAllFieldsAreNull() {
-        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, null, null, null);
+        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, null, null);
 
         Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(request);
 
@@ -102,19 +102,11 @@ class RequestValidationTest {
 
     @Test
     void updateUserRequest_isInvalid_whenEmailIsMalformed() {
-        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, "not-an-email", null, null);
+        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, "not-an-email", null);
 
         Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(request);
 
         assertThat(violations).anyMatch(v -> v.getPropertyPath().toString().equals("email"));
     }
 
-    @Test
-    void updateUserRequest_isInvalid_whenPasswordIsTooShort() {
-        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, null, "short", null);
-
-        Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(request);
-
-        assertThat(violations).anyMatch(v -> v.getPropertyPath().toString().equals("password"));
-    }
 }

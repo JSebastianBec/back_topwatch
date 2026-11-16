@@ -48,4 +48,12 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).containsEntry("message", "Item name is required");
     }
+
+    @Test
+    void handleJwt_returnsUnauthorized() {
+        var response = handler.handleJwt(new io.jsonwebtoken.MalformedJwtException("bad token"));
+
+        org.assertj.core.api.Assertions.assertThat(response.getStatusCode().value()).isEqualTo(401);
+        org.assertj.core.api.Assertions.assertThat(response.getBody()).containsEntry("message", "Invalid token");
+    }
 }

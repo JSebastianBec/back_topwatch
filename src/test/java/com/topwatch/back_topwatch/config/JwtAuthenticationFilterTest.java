@@ -120,4 +120,30 @@ class JwtAuthenticationFilterTest {
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain).doFilter(request, response);
     }
+
+    @Test
+    void doFilterInternal_continuesChainWithoutAuth_whenTokenIsMalformed() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn("Bearer not-a-jwt");
+        when(jwtService.extractJti("not-a-jwt")).thenThrow(new io.jsonwebtoken.MalformedJwtException("bad token"));
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        verify(filterChain).doFilter(request, response);
+        verify(userDetailsService, never()).loadUserByUsername(anyString());
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
+    void doFilterInternal_continuesChainWithoutAuth_whenUserNoLongerExists() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn("Bearer deleted-user-token");
+        when(jwtService.extractJti("deleted-user-token")).thenReturn("jti-2");
+        when(jwtService.extractUsername("deleted-user-token")).thenReturn("gone@topwatch.com");
+        when(userDetailsService.loadUserByUsername("gone@topwatch.com"))
+                .thenThrow(new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found"));
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        verify(filterChain).doFilter(request, response);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
 }
