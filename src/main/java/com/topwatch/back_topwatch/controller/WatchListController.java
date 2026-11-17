@@ -5,6 +5,7 @@ import com.topwatch.back_topwatch.domain.WatchList;
 import com.topwatch.back_topwatch.domain.WatchListView;
 import com.topwatch.back_topwatch.dto.AddToMyWatchListsRequest;
 import com.topwatch.back_topwatch.dto.AddWatchListItemsRequest;
+import com.topwatch.back_topwatch.dto.RemoveWatchListItemsRequest;
 import com.topwatch.back_topwatch.dto.CreateWatchListRequest;
 import com.topwatch.back_topwatch.dto.WatchListDetailResponse;
 import com.topwatch.back_topwatch.dto.WatchListResponse;
@@ -142,6 +143,22 @@ public class WatchListController {
                 .body(watchListService.addItemsToWatchList(id, request.itemIds(), currentUser).stream()
                         .map(WatchListDetailResponse.WatchListItemEntry::from)
                         .toList());
+    }
+
+    @Operation(
+            summary = "Remove items from watch list",
+            description = "Removes one or more items (by item id) from a watch list owned by the authenticated user, together with "
+                    + "every viewer's watched state for them. The items are kept. All items are removed or none are",
+            security = @SecurityRequirement(name = "Bearer Token")
+    )
+    @PostMapping("/{id}/items/remove")
+    public ResponseEntity<Void> removeItemsFromWatchList(
+            @PathVariable Long id,
+            @Valid @RequestBody RemoveWatchListItemsRequest request,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        watchListService.removeItemsFromWatchList(id, request.itemIds(), currentUser);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
