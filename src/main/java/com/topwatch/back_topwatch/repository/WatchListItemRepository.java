@@ -22,6 +22,10 @@ public interface WatchListItemRepository extends JpaRepository<WatchListItem, Lo
 
     long countByWatchList_Id(Long watchListId);
 
+    boolean existsByItem_Id(Long itemId);
+
+    boolean existsByCreator_Id(Long creatorId);
+
     /** Ids of the watch lists created by someone other than the user that contain the item. */
     @Query("""
             select distinct wli.watchList.id from WatchListItem wli

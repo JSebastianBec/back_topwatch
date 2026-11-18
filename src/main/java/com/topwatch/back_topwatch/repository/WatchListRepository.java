@@ -13,6 +13,8 @@ public interface WatchListRepository extends JpaRepository<WatchList, Long> {
 
     List<WatchList> findByCreator_Id(Long creatorId);
 
+    boolean existsByCreator_Id(Long creatorId);
+
     /** Lists the user created plus lists from other users they added to their own, own ones first. */
     @Query("""
             select w from WatchList w

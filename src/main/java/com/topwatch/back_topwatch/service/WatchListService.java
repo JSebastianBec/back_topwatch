@@ -184,13 +184,61 @@ public class WatchListService {
         if (!watchList.getCreator().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Only the watch list creator can delete it");
         }
+        removeWatchList(watchList);
+    }
 
+    /** Moderation: removes a reported watch list whoever created it. */
+    @Transactional
+    public void deleteWatchListAsAdmin(@NonNull Long watchListId) {
+        removeWatchList(watchListRepository.findById(watchListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Watch list not found")));
+    }
+
+    private void removeWatchList(WatchList watchList) {
+        Long watchListId = watchList.getId();
         // Children first so no foreign key points to a removed row
         watchListViewItemRepository.deleteByWatchListId(watchListId);
         watchListViewRepository.deleteByWatchListId(watchListId);
         savedWatchListRepository.deleteByWatchListId(watchListId);
         watchListItemRepository.deleteByWatchListId(watchListId);
         watchListRepository.delete(watchList);
+    }
+
+    /**
+     * Removes items from a watch list. Only its creator can do it. Every viewer's watched state for those
+     * entries goes with them. The items themselves are kept. All are removed or none: fails on unknown
+     * ids and on items that are not in the list.
+     */
+    @Transactional
+    public void removeItemsFromWatchList(@NonNull Long watchListId, @NonNull List<Long> itemIds, @NonNull User currentUser) {
+        WatchList watchList = watchListRepository.findById(watchListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Watch list not found"));
+        if (!watchList.getCreator().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Only the watch list creator can remove items from it");
+        }
+
+        if (itemIds.isEmpty()) {
+            throw new BadRequestException("At least one item id is required");
+        }
+        if (itemIds.stream().anyMatch(Objects::isNull)) {
+            throw new BadRequestException("Item id is required");
+        }
+        Set<Long> uniqueItemIds = new LinkedHashSet<>(itemIds);
+
+        List<WatchListItem> entries = watchListItemRepository.findByWatchList_IdAndItem_IdIn(watchListId, uniqueItemIds);
+        Set<Long> foundItemIds = entries.stream()
+                .map(entry -> entry.getItem().getId())
+                .collect(Collectors.toSet());
+        List<Long> missingItemIds = uniqueItemIds.stream()
+                .filter(itemId -> !foundItemIds.contains(itemId))
+                .toList();
+        if (!missingItemIds.isEmpty()) {
+            throw new ResourceNotFoundException("Items not in this watch list: " + missingItemIds);
+        }
+
+        // Children first so no foreign key points to a removed row
+        watchListViewItemRepository.deleteByWatchListItemIds(entries.stream().map(WatchListItem::getId).toList());
+        watchListItemRepository.deleteAllInBatch(entries);
     }
 
 }

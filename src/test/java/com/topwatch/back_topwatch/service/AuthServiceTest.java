@@ -65,7 +65,7 @@ class AuthServiceTest {
 
     @Test
     void register_savesUserWithEncodedPasswordAndReturnsTokens() {
-        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "plainPassword", "sebas");
+        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "plainPassword", "sebas", true);
         when(passwordEncoder.encode("plainPassword")).thenReturn("encoded-password");
         when(jwtService.generateAccessToken(any(User.class))).thenReturn("access-token");
         when(jwtService.generateRefreshToken(any(User.class))).thenReturn("refresh-token");
@@ -80,6 +80,8 @@ class AuthServiceTest {
         assertThat(savedUser.getPassword()).isEqualTo("encoded-password");
         assertThat(savedUser.getNickname()).isEqualTo("sebas");
         assertThat(savedUser.getRole()).isEqualTo(Role.USER);
+        assertThat(savedUser.getTermsAcceptedAt()).isNotNull();
+        assertThat(savedUser.getTermsVersion()).isEqualTo(AuthService.CURRENT_TERMS_VERSION);
         assertThat(response.accessToken()).isEqualTo("access-token");
         assertThat(response.refreshToken()).isEqualTo("refresh-token");
     }

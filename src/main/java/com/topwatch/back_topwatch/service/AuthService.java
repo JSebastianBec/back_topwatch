@@ -13,9 +13,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    /** Raise it whenever the published terms or privacy policy change substantially. */
+    public static final String CURRENT_TERMS_VERSION = "1.0";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -29,6 +34,8 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.password()))
                 .nickname(request.nickname())
                 .role(Role.USER)
+                .termsAcceptedAt(Instant.now())
+                .termsVersion(CURRENT_TERMS_VERSION)
                 .build();
 
         userRepository.save(user);

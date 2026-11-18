@@ -13,6 +13,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findByNameContainingIgnoreCase(String name);
 
+    List<Item> findByCreator_Id(Long creatorId);
+
+    boolean existsByCreator_Id(Long creatorId);
+
     @Query("SELECT i FROM Item i WHERE i.id NOT IN " +
             "(SELECT wli.item.id FROM WatchListItem wli WHERE wli.watchList.id = :watchListId)")
     List<Item> findAllNotInWatchList(@Param("watchListId") Long watchListId);

@@ -29,7 +29,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/users/health").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/users/health", "/legal/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").hasRole(Role.ADMIN.name())
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
                         // Listing every user or reading another user's profile is admin only

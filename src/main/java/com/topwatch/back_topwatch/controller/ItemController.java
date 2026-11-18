@@ -4,6 +4,7 @@ import com.topwatch.back_topwatch.domain.Item;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.dto.CreateItemRequest;
 import com.topwatch.back_topwatch.dto.ItemResponse;
+import com.topwatch.back_topwatch.service.BlockService;
 import com.topwatch.back_topwatch.service.ImageStorageService;
 import com.topwatch.back_topwatch.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,6 +32,16 @@ public class ItemController {
 
     private final ItemService itemService;
     private final ImageStorageService imageStorageService;
+    private final BlockService blockService;
+
+    /** Leaves out the items created by users the current user blocked. */
+    private List<ItemResponse> visibleTo(User currentUser, List<Item> items) {
+        Set<Long> blockedIds = blockService.findBlockedUserIds(currentUser);
+        return items.stream()
+                .filter(item -> !blockedIds.contains(item.getCreator().getId()))
+                .map(ItemResponse::from)
+                .collect(Collectors.toList());
+    }
 
     @Operation(
             summary = "Create item",
@@ -72,13 +84,14 @@ public class ItemController {
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @GetMapping
-    public List<ItemResponse> getAllItems(@RequestParam(required = false) Long excludeWatchListId) {
+    public List<ItemResponse> getAllItems(
+            @RequestParam(required = false) Long excludeWatchListId,
+            @AuthenticationPrincipal User currentUser
+    ) {
         List<Item> items = excludeWatchListId == null
                 ? itemService.findAllItems()
                 : itemService.findItemsNotInWatchList(excludeWatchListId);
-        return items.stream()
-                .map(ItemResponse::from)
-                .collect(Collectors.toList());
+        return visibleTo(currentUser, items);
     }
 
     @Operation(
@@ -89,14 +102,13 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemResponse> searchItemsByName(
             @RequestParam String name,
-            @RequestParam(required = false) Long excludeWatchListId
+            @RequestParam(required = false) Long excludeWatchListId,
+            @AuthenticationPrincipal User currentUser
     ) {
         List<Item> items = excludeWatchListId == null
                 ? itemService.findItemsByName(name)
                 : itemService.findItemsByNameNotInWatchList(name, excludeWatchListId);
-        return items.stream()
-                .map(ItemResponse::from)
-                .collect(Collectors.toList());
+        return visibleTo(currentUser, items);
     }
 
     @Operation(

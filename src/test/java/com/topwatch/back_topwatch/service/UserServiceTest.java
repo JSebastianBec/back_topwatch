@@ -1,11 +1,21 @@
 package com.topwatch.back_topwatch.service;
 
+import com.topwatch.back_topwatch.domain.Item;
 import com.topwatch.back_topwatch.domain.User;
+import com.topwatch.back_topwatch.domain.WatchList;
 import com.topwatch.back_topwatch.domain.enums.Gender;
 import com.topwatch.back_topwatch.domain.enums.Role;
 import com.topwatch.back_topwatch.dto.UpdateUserRequest;
 import com.topwatch.back_topwatch.exception.DuplicateResourceException;
+import com.topwatch.back_topwatch.repository.ContentReportRepository;
+import com.topwatch.back_topwatch.repository.ItemRepository;
+import com.topwatch.back_topwatch.repository.SavedWatchListRepository;
+import com.topwatch.back_topwatch.repository.UserBlockRepository;
 import com.topwatch.back_topwatch.repository.UserRepository;
+import com.topwatch.back_topwatch.repository.WatchListItemRepository;
+import com.topwatch.back_topwatch.repository.WatchListRepository;
+import com.topwatch.back_topwatch.repository.WatchListViewItemRepository;
+import com.topwatch.back_topwatch.repository.WatchListViewRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +46,30 @@ class UserServiceTest {
 
     @Mock
     private ImageStorageService imageStorageService;
+
+    @Mock
+    private WatchListRepository watchListRepository;
+
+    @Mock
+    private WatchListItemRepository watchListItemRepository;
+
+    @Mock
+    private WatchListViewRepository watchListViewRepository;
+
+    @Mock
+    private WatchListViewItemRepository watchListViewItemRepository;
+
+    @Mock
+    private SavedWatchListRepository savedWatchListRepository;
+
+    @Mock
+    private ItemRepository itemRepository;
+
+    @Mock
+    private UserBlockRepository userBlockRepository;
+
+    @Mock
+    private ContentReportRepository contentReportRepository;
 
     @InjectMocks
     private UserService userService;
@@ -154,10 +188,52 @@ class UserServiceTest {
     }
 
     @Test
-    void delete_delegatesToRepository() {
-        userService.delete(currentUser);
+    void delete_removesUserAndPersonalData_whenNobodyDependsOnThem() {
+        currentUser.setAvatarURL("avatar.png");
+        WatchList ownList = WatchList.builder().id(5L).build();
+        Item ownItem = Item.builder().id(9L).urlAvatar("item.png").build();
+        when(watchListRepository.findByCreator_Id(1L)).thenReturn(List.of(ownList));
+        when(itemRepository.findByCreator_Id(1L)).thenReturn(List.of(ownItem));
 
+        List<String> unusedImages = userService.delete(currentUser);
+
+        verify(watchListViewItemRepository).deleteByViewerId(1L);
+        verify(watchListViewRepository).deleteByViewerId(1L);
+        verify(savedWatchListRepository).deleteByUserId(1L);
+        verify(userBlockRepository).deleteByUserId(1L);
+        verify(contentReportRepository).deleteByReporterId(1L);
+        verify(watchListItemRepository).deleteByWatchListId(5L);
+        verify(watchListRepository).delete(ownList);
+        verify(itemRepository).delete(ownItem);
         verify(userRepository, times(1)).delete(currentUser);
+        assertThat(unusedImages).containsExactly("item.png", "avatar.png");
+    }
+
+    @Test
+    void delete_keepsSharedContent_andWipesPersonalData_whenOthersDependOnIt() {
+        currentUser.setAvatarURL("avatar.png");
+        WatchList sharedList = WatchList.builder().id(5L).build();
+        Item sharedItem = Item.builder().id(9L).urlAvatar("item.png").build();
+        when(watchListRepository.findByCreator_Id(1L)).thenReturn(List.of(sharedList));
+        when(watchListViewRepository.existsByWatchList_Id(5L)).thenReturn(true);
+        when(itemRepository.findByCreator_Id(1L)).thenReturn(List.of(sharedItem));
+        when(watchListItemRepository.existsByItem_Id(9L)).thenReturn(true);
+        when(watchListRepository.existsByCreator_Id(1L)).thenReturn(true);
+        when(passwordEncoder.encode(any())).thenReturn("random-encoded");
+
+        List<String> unusedImages = userService.delete(currentUser);
+
+        verify(watchListRepository, never()).delete(sharedList);
+        verify(itemRepository, never()).delete(sharedItem);
+        verify(userRepository, never()).delete(currentUser);
+        verify(userRepository).save(currentUser);
+        assertThat(currentUser.getName()).isNull();
+        assertThat(currentUser.getLastname()).isNull();
+        assertThat(currentUser.getAvatarURL()).isNull();
+        assertThat(currentUser.getNickname()).isEqualTo("deleted-user-1");
+        assertThat(currentUser.getEmail()).isEqualTo("deleted-user-1@deleted.invalid");
+        assertThat(currentUser.getPassword()).isEqualTo("random-encoded");
+        assertThat(unusedImages).containsExactly("avatar.png");
     }
 
     @Test

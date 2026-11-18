@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,14 @@ public interface WatchListViewItemRepository extends JpaRepository<WatchListView
     @Query("delete from WatchListViewItem vi where vi.watchListView.id = :viewId")
     void deleteByViewId(@Param("viewId") Long viewId);
 
+    /** The viewer's watched state across all their views. */
+    @Modifying
+    @Query("""
+            delete from WatchListViewItem vi
+            where vi.watchListView.id in (select v.id from WatchListView v where v.viewer.id = :viewerId)
+            """)
+    void deleteByViewerId(@Param("viewerId") Long viewerId);
+
     /** Every viewer's watched state for the entries of one watch list. */
     @Modifying
     @Query("""
@@ -56,5 +65,10 @@ public interface WatchListViewItemRepository extends JpaRepository<WatchListView
             where vi.watchListItem.id in (select wli.id from WatchListItem wli where wli.item.id = :itemId)
             """)
     void deleteByItemId(@Param("itemId") Long itemId);
+
+    /** Every viewer's watched state for the given watch list entries. */
+    @Modifying
+    @Query("delete from WatchListViewItem vi where vi.watchListItem.id in :watchListItemIds")
+    void deleteByWatchListItemIds(@Param("watchListItemIds") Collection<Long> watchListItemIds);
 
 }

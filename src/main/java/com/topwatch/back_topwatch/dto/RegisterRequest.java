@@ -1,5 +1,6 @@
 package com.topwatch.back_topwatch.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,9 @@ public record RegisterRequest(
         String password,
 
         @NotBlank(message = "Nickname is required")
-        String nickname
+        String nickname,
+
+        @AssertTrue(message = "You must accept the terms and the privacy policy")
+        boolean acceptedTerms
 
 ) {}
