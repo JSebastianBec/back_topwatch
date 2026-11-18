@@ -9,6 +9,7 @@ import com.topwatch.back_topwatch.dto.RemoveWatchListItemsRequest;
 import com.topwatch.back_topwatch.dto.CreateWatchListRequest;
 import com.topwatch.back_topwatch.dto.WatchListDetailResponse;
 import com.topwatch.back_topwatch.dto.WatchListResponse;
+import com.topwatch.back_topwatch.service.BlockService;
 import com.topwatch.back_topwatch.service.WatchListService;
 import com.topwatch.back_topwatch.service.WatchListViewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/watch-lists")
@@ -32,6 +34,15 @@ public class WatchListController {
 
     private final WatchListService watchListService;
     private final WatchListViewService watchListViewService;
+    private final BlockService blockService;
+
+    /** Drops the watch lists created by users the current user blocked. */
+    private List<WatchList> withoutBlocked(List<WatchList> watchLists, User currentUser) {
+        Set<Long> blockedIds = blockService.findBlockedUserIds(currentUser);
+        return watchLists.stream()
+                .filter(watchList -> !blockedIds.contains(watchList.getCreator().getId()))
+                .toList();
+    }
 
     @Operation(
             summary = "Get all watch lists",
@@ -41,7 +52,7 @@ public class WatchListController {
     @GetMapping
     public List<WatchListResponse> getAllWatchLists(@AuthenticationPrincipal User currentUser) {
         Map<Long, Long> viewIds = watchListViewService.findViewIdsByWatchListId(currentUser);
-        return watchListService.findAllWatchLists().stream()
+        return withoutBlocked(watchListService.findAllWatchLists(), currentUser).stream()
                 .map(watchList -> WatchListResponse.from(watchList, viewIds.get(watchList.getId()), currentUser.getId()))
                 .toList();
     }
@@ -54,7 +65,7 @@ public class WatchListController {
     @GetMapping("/me")
     public List<WatchListResponse> getMyWatchLists(@AuthenticationPrincipal User currentUser) {
         Map<Long, Long> viewIds = watchListViewService.findViewIdsByWatchListId(currentUser);
-        return watchListService.findMyWatchLists(currentUser).stream()
+        return withoutBlocked(watchListService.findMyWatchLists(currentUser), currentUser).stream()
                 .map(watchList -> WatchListResponse.from(watchList, viewIds.get(watchList.getId()), currentUser.getId()))
                 .toList();
     }
@@ -66,7 +77,7 @@ public class WatchListController {
     )
     @GetMapping("/not-started")
     public List<WatchListResponse> getNotStartedWatchLists(@AuthenticationPrincipal User currentUser) {
-        return watchListService.findWatchListsNotStartedBy(currentUser).stream()
+        return withoutBlocked(watchListService.findWatchListsNotStartedBy(currentUser), currentUser).stream()
                 .map(watchList -> WatchListResponse.from(watchList, null, currentUser.getId()))
                 .toList();
     }

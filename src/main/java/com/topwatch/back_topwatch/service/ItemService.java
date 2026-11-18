@@ -93,11 +93,21 @@ public class ItemService {
             throw new ResourceInUseException("Item is used in watch lists created by other users: " + otherUsersWatchListIds);
         }
 
-        // Children first so no foreign key points to a removed row; item_categories rows go with the item
-        watchListViewItemRepository.deleteByItemId(itemId);
-        watchListItemRepository.deleteByItemId(itemId);
-        itemRepository.delete(item);
+        removeItem(item);
         return item;
+    }
+
+    /** Moderation: removes a reported item from every watch list, whoever created it. */
+    @Transactional
+    public void deleteItemAsAdmin(@NonNull Item item) {
+        removeItem(item);
+    }
+
+    private void removeItem(Item item) {
+        // Children first so no foreign key points to a removed row; item_categories rows go with the item
+        watchListViewItemRepository.deleteByItemId(item.getId());
+        watchListItemRepository.deleteByItemId(item.getId());
+        itemRepository.delete(item);
     }
 
 }

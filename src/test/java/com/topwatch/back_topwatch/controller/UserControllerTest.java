@@ -3,6 +3,7 @@ package com.topwatch.back_topwatch.controller;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.domain.enums.Role;
 import com.topwatch.back_topwatch.dto.UpdateUserRequest;
+import com.topwatch.back_topwatch.service.ImageStorageService;
 import com.topwatch.back_topwatch.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,13 +29,16 @@ class UserControllerTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private ImageStorageService imageStorageService;
+
     private UserController userController;
 
     private User user;
 
     @BeforeEach
     void setUp() {
-        userController = new UserController(userService);
+        userController = new UserController(userService, imageStorageService);
         user = User.builder()
                 .id(1L)
                 .email("sebas@topwatch.com")
@@ -77,6 +82,18 @@ class UserControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         verify(userService).delete(user);
+    }
+
+    @Test
+    void delete_removesUnusedImages_andSurvivesStorageFailures() {
+        when(userService.findUserById(1L)).thenReturn(Optional.of(user));
+        when(userService.delete(user)).thenReturn(List.of("broken.png", "ok.png"));
+        doThrow(new RuntimeException("S3 down")).when(imageStorageService).deleteIfOwned("broken.png", 1L);
+
+        ResponseEntity<String> response = userController.delete(1L, user);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(imageStorageService).deleteIfOwned("ok.png", 1L);
     }
 
     @Test

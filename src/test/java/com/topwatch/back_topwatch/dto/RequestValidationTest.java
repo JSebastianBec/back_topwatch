@@ -30,7 +30,7 @@ class RequestValidationTest {
 
     @Test
     void registerRequest_isInvalid_whenEmailIsBlank() {
-        RegisterRequest request = new RegisterRequest("", "password123", "sebas");
+        RegisterRequest request = new RegisterRequest("", "password123", "sebas", true);
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -39,7 +39,7 @@ class RequestValidationTest {
 
     @Test
     void registerRequest_isInvalid_whenEmailIsMalformed() {
-        RegisterRequest request = new RegisterRequest("not-an-email", "password123", "sebas");
+        RegisterRequest request = new RegisterRequest("not-an-email", "password123", "sebas", true);
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -48,7 +48,7 @@ class RequestValidationTest {
 
     @Test
     void registerRequest_isInvalid_whenPasswordIsTooShort() {
-        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "short", "sebas");
+        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "short", "sebas", true);
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -57,7 +57,7 @@ class RequestValidationTest {
 
     @Test
     void registerRequest_isInvalid_whenNicknameIsBlank() {
-        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "password123", "  ");
+        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "password123", "  ", true);
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -66,7 +66,7 @@ class RequestValidationTest {
 
     @Test
     void registerRequest_isValid_whenAllFieldsAreCorrect() {
-        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "password123", "sebas");
+        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "password123", "sebas", true);
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 

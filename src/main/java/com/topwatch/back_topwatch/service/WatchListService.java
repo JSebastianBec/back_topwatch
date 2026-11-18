@@ -184,7 +184,18 @@ public class WatchListService {
         if (!watchList.getCreator().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Only the watch list creator can delete it");
         }
+        removeWatchList(watchList);
+    }
 
+    /** Moderation: removes a reported watch list whoever created it. */
+    @Transactional
+    public void deleteWatchListAsAdmin(@NonNull Long watchListId) {
+        removeWatchList(watchListRepository.findById(watchListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Watch list not found")));
+    }
+
+    private void removeWatchList(WatchList watchList) {
+        Long watchListId = watchList.getId();
         // Children first so no foreign key points to a removed row
         watchListViewItemRepository.deleteByWatchListId(watchListId);
         watchListViewRepository.deleteByWatchListId(watchListId);

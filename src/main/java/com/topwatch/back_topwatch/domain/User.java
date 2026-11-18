@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.topwatch.back_topwatch.domain.enums.Gender;
 import com.topwatch.back_topwatch.domain.enums.Role;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,6 +50,15 @@ public class User implements UserDetails {
 
     @Column()
     private String avatarURL;
+
+    /** Proof of the user's consent: when they accepted the terms and privacy policy, and which version. */
+    @JsonIgnore
+    @Column(name = "terms_accepted_at")
+    private Instant termsAcceptedAt;
+
+    @JsonIgnore
+    @Column(name = "terms_version")
+    private String termsVersion;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

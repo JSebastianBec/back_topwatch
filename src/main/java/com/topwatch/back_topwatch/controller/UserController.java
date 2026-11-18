@@ -3,12 +3,14 @@ package com.topwatch.back_topwatch.controller;
 import com.topwatch.back_topwatch.domain.User;
 import com.topwatch.back_topwatch.domain.enums.Role;
 import com.topwatch.back_topwatch.dto.UpdateUserRequest;
+import com.topwatch.back_topwatch.service.ImageStorageService;
 import com.topwatch.back_topwatch.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+    private final ImageStorageService imageStorageService;
 
     @Operation(
             summary = "Health check",
@@ -61,7 +65,8 @@ public class UserController {
 
     @Operation(
             summary = "Delete user",
-            description = "Deletes the user with the given id. Allowed only for the user themselves or an ADMIN; anyone else gets 403.",
+            description = "Deletes the user with the given id and their personal data. Watch lists and items other users "
+                    + "depend on are kept without any personal data. Allowed only for the user themselves or an ADMIN; anyone else gets 403.",
             security = @SecurityRequirement(name = "Bearer Token")
     )
     @PostMapping("/delete/{id}")
@@ -76,7 +81,14 @@ public class UserController {
         }
         Optional<User> user = userService.findUserById(id);
         if (user.isPresent()){
-            userService.delete(user.get());
+            // The account is already gone, so a storage failure must not turn this into an error
+            for (String imageUrl : userService.delete(user.get())) {
+                try {
+                    imageStorageService.deleteIfOwned(imageUrl, id);
+                } catch (RuntimeException e) {
+                    log.warn("Could not delete image of user {}: {}", id, e.getMessage());
+                }
+            }
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

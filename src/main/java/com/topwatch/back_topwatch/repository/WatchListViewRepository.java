@@ -19,6 +19,12 @@ public interface WatchListViewRepository extends JpaRepository<WatchListView, Lo
 
     Optional<WatchListView> findByViewer_IdAndWatchList_Id(Long viewerId, Long watchListId);
 
+    boolean existsByWatchList_Id(Long watchListId);
+
+    @Modifying
+    @Query("delete from WatchListView v where v.viewer.id = :viewerId")
+    void deleteByViewerId(@Param("viewerId") Long viewerId);
+
     @Modifying
     @Query("delete from WatchListView v where v.watchList.id = :watchListId")
     void deleteByWatchListId(@Param("watchListId") Long watchListId);

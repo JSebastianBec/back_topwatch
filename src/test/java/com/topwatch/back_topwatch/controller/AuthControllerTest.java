@@ -33,7 +33,7 @@ class AuthControllerTest {
 
     @Test
     void register_returnsCreatedWithTokens() {
-        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "password123", "sebas");
+        RegisterRequest request = new RegisterRequest("sebas@topwatch.com", "password123", "sebas", true);
         AuthResponse expected = new AuthResponse("access-token", "refresh-token");
         when(authService.register(request)).thenReturn(expected);
 

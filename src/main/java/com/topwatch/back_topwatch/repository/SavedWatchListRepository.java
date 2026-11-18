@@ -15,6 +15,12 @@ public interface SavedWatchListRepository extends JpaRepository<SavedWatchList, 
 
     List<SavedWatchList> findByUser_IdAndWatchList_IdIn(Long userId, Collection<Long> watchListIds);
 
+    boolean existsByWatchList_Id(Long watchListId);
+
+    @Modifying
+    @Query("delete from SavedWatchList s where s.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+
     @Modifying
     @Query("delete from SavedWatchList s where s.watchList.id = :watchListId")
     void deleteByWatchListId(@Param("watchListId") Long watchListId);

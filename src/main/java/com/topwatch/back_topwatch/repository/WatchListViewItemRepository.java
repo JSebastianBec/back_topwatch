@@ -42,6 +42,14 @@ public interface WatchListViewItemRepository extends JpaRepository<WatchListView
     @Query("delete from WatchListViewItem vi where vi.watchListView.id = :viewId")
     void deleteByViewId(@Param("viewId") Long viewId);
 
+    /** The viewer's watched state across all their views. */
+    @Modifying
+    @Query("""
+            delete from WatchListViewItem vi
+            where vi.watchListView.id in (select v.id from WatchListView v where v.viewer.id = :viewerId)
+            """)
+    void deleteByViewerId(@Param("viewerId") Long viewerId);
+
     /** Every viewer's watched state for the entries of one watch list. */
     @Modifying
     @Query("""
